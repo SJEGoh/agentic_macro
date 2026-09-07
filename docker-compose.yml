@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  agent-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - IS_LOCAL=true
+    # Allows container to talk to Ollama running on your host OS
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
