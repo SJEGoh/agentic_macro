@@ -1,12 +1,15 @@
-version: '3.8'
-
 services:
-  agent-api:
+  agentic-macro:
     build: .
-    ports:
-      - "8000:8000"
+    container_name: agentic-macro
+    restart: unless-stopped
+    env_file: .env
     environment:
-      - IS_LOCAL=true
-    # Allows container to talk to Ollama running on your host OS
+      # The executor is reachable on the tailnet only; from another container that means the
+      # host's tailnet address, not localhost.
+      EXECUTOR_URL: ${EXECUTOR_URL:-http://host.docker.internal:8000}
+      AGENTIC_DB_PATH: /app/db/worldviews.db
+    volumes:
+      - ./db:/app/db
     extra_hosts:
       - "host.docker.internal:host-gateway"

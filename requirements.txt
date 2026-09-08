@@ -1,0 +1,8 @@
+# The sleeve talks to the executor over HTTP and to Gemini over the Google Gen AI SDK.
+# Nothing here
+# needs to match the executor's own pinned set — this runs as its own process.
+google-genai>=1.0.0
+requests>=2.32.0
+python-dotenv>=1.0.0
+yfinance>=0.2.60
+pytest>=8.0.0
