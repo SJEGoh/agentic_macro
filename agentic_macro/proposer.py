@@ -36,14 +36,23 @@ class ProposalError(RuntimeError):
 
 class ProposedLeg(NamedTuple):
     symbol: str
-    quantity: float          # signed, whole shares — computed here, never by the model
+    quantity: float          # signed, whole units — computed here, never by the model
     entry_price: float
-    notional: float          # signed dollars, before rounding to whole shares
+    notional: float          # signed dollars, before rounding to whole units
     rationale: str
+    #: Contract multiplier, carried on the leg rather than looked up later. A futures
+    #: notional computed without it is understated by the multiplier — 1,000x on a note
+    #: future — which sails straight past the allocation cap without tripping anything.
+    multiplier: float = 1.0
+
+    @property
+    def unit_value(self) -> float:
+        """What ONE unit costs: price for a share, price * multiplier for a contract."""
+        return self.entry_price * self.multiplier
 
     @property
     def risk(self) -> float:
-        return abs(self.quantity) * self.entry_price
+        return abs(self.quantity) * self.unit_value
 
 
 class Proposal(NamedTuple):
@@ -57,6 +66,9 @@ class Proposal(NamedTuple):
     budget: float
     hedge_note: str = ""     # how the hedge ratio was derived, in words
     dropped: tuple = ()      # legs the budget could not buy a single share of
+    substituted: tuple = ()  # futures legs replaced by their ETF equivalent, and why
+    context: tuple = ()      # the news the model was shown
+    context_note: str = ""   # why there was none, when there was none
 
     def gross(self) -> float:
         return sum(l.risk for l in self.legs)
@@ -143,26 +155,88 @@ SCHEMA = {
 }
 
 
-def system_prompt(thesis: str = "") -> str:
+def contract_prices() -> dict:
+    """Last price for each FUTURES instrument, for the "1 contract = $X" line in the
+    catalogue. Best effort on purpose, and this is the one price path where that is right:
+    these numbers are shown to the model so it can tell what fits the sleeve, and they size
+    nothing. A failure here costs the model a hint; a failure in `size()` would cost a
+    mis-sized order, which is why that one raises."""
+    from . import prices as _prices
+    futures = [i.symbol for i in universe.UNIVERSE if i.sec_type == "FUT"]
+    try:
+        return _prices.fetch(futures)
+    except Exception as e:
+        log.warning("no futures prices for the prompt (contract sizes will show as "
+                    "multipliers): %s", e)
+        return {}
+
+
+EVENT_GUIDANCE = """
+
+THIS IS AN EVENT TRADE, NOT A SLEEVE POSITION.
+
+A scheduled release reprices markets in minutes and the position is held for well under an
+hour. That changes which structures are appropriate, and the change is not a preference:
+
+  * A DV01-neutral or beta-neutral structure is CONSTRUCTED to cancel the dominant factor —
+    the level of rates, the level of the market. That is exactly what a CPI print or a
+    payrolls number moves. Those structures are excellent for a view held over weeks and are
+    the wrong instrument here, so they are not on the menu below.
+  * Take a DIRECTION. Say which way the release moves the most exposed instrument, and hold
+    that. A spread trade whose two legs both move with the surprise nets to nothing.
+  * Prefer the single most exposed instrument over a basket. Diversifying across a
+    forty-minute window dilutes the only thing being bet on.
+  * Size for a move of a few tenths of a percent at most. If the release is genuinely
+    unlikely to move your instrument, say the view is not expressible rather than
+    manufacturing a trade for the sake of one."""
+
+
+def schema_for(mode: str = "sleeve") -> dict:
+    """The response schema. In event mode the structure enum drops the neutralising
+    playbooks, so the model cannot pick a trade built to ignore what the event moves."""
+    if mode != "event":
+        return SCHEMA
+    import copy
+    s = copy.deepcopy(SCHEMA)
+    s["properties"]["structure"]["enum"] = playbooks.directional_names() + ["custom"]
+    s["properties"]["weighting"]["enum"] = sorted(
+        playbooks.WEIGHTINGS - playbooks.NEUTRALISING)
+    return s
+
+
+def system_prompt(thesis: str = "", prices: dict = None, mode: str = "sleeve") -> str:
     """Built per call so the playbook catalogue can be ranked for the thesis. The universe
     and the instructions are byte-identical every time and sit first, so the expensive part
     of this prompt caches even though the ranking below it moves."""
+    prices = prices if prices is not None else contract_prices()
     return f"""\
 You are the analyst for a discretionary macro sleeve. You turn one stated worldview into
-the most direct STRUCTURE available in a fixed universe of ETFs.
+the most direct STRUCTURE available in a fixed universe of ETFs and futures.
 
 You do not size positions and you do not quote prices. You choose a structure, instruments,
 directions, and relative weights within each side of the trade; the system converts those
-into share counts using live prices, the sleeve's capital, and the instrument risk data
-below. Never state a dollar amount, a share count, or a price level.
+into share and contract counts using live prices, the sleeve's capital, and the instrument
+risk data below. Never state a dollar amount, a share count, or a price level.
 
 TRADEABLE UNIVERSE — you may name NOTHING outside this list:
 
-{universe.catalogue()}
+{universe.catalogue(prices)}
+
+On the futures. They give you the real instrument rather than a proxy: a note future carries
+the cheapest-to-deliver's duration instead of a fund's, and a commodity future holds the
+commodity instead of paying a roll to an ETF that holds it for you. But ONE CONTRACT IS
+INDIVISIBLE and large — the size is printed above where a price was available. A structure
+whose smallest leg costs more than its share of the budget cannot be built at all, so on a
+small sleeve the ETF proxies (SHY, IEF, TLT, GLD, USO) are frequently the only expression
+that fits. Reach for a future when the contract size works against the capital shown below,
+and for the ETF when it does not.
 
 PLAYBOOKS — the named structures, best matches for this view first:
 
-{playbooks.catalogue(thesis)}
+{playbooks.catalogue(thesis) if mode != "event" else chr(10).join(
+    p.render() for p in playbooks.select(thesis)
+    if p.weighting not in playbooks.NEUTRALISING)}
+{EVENT_GUIDANCE if mode == "event" else ""}
 
 How to work:
 
@@ -190,6 +264,11 @@ How to work:
    it a 50/50 fly, and the system converts that into the very different dollar amounts the
    two wings need. Write the structure the way it is described in the playbook, and let the
    arithmetic happen downstream.
+
+   Most multi-asset baskets are weighted `inverse_vol`: the legs are balanced on realised
+   volatility, so equal weights mean equal RISK rather than equal dollars. Do not try to
+   hand-correct for a volatile leg by giving it a smaller weight — that double-counts.
+   Weight by conviction and let the volatility scaling do its job.
 
 5. Say when it is already priced. If the view is consensus, say so and lower your
    confidence. You are not obliged to find a trade.
@@ -235,55 +314,58 @@ def _context(views: list, allocation: float, capital_used: float) -> str:
             f"  room remaining  ${room:,.0f}\n")
 
 
+def macro_context(thesis: str, as_of: float = None) -> tuple:
+    """(prompt block, hits, note). Never raises.
+
+    Memory is enrichment: the sleeve proposed structures for weeks without it. But a failure
+    must be VISIBLE, because a proposal that silently lost its context is indistinguishable
+    from one that never had any — and the difference matters when you are deciding whether
+    the model knew about last week's CPI print."""
+    if not config.MEMORY_ENABLED:
+        return "", [], ""
+    try:
+        from . import memory
+        block, hits = memory.context_block(thesis, as_of=as_of)
+        if not hits:
+            return "", [], "no recent news in the store (run `ingest`)"
+        return block, hits, ""
+    except Exception as e:
+        log.warning("no macro context: %s", e)
+        return "", [], f"context unavailable ({str(e)[:90]})"
+
+
 def propose(thesis: str, views: list, allocation: float, capital_used: float,
-            client=None) -> dict:
+            prices: dict = None, as_of: float = None, mode: str = "sleeve") -> dict:
     """Ask the model for a structure and its legs. Returns the raw validated dict; `size()`
     turns it into a Proposal. Split in two so the model call can be tested without pricing
-    and the sizing can be tested without the network."""
-    from google.genai import types
+    and the sizing can be tested without the network.
 
-    if client is None:
-        from google import genai
-        key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-        if not key:
-            raise ProposalError("GEMINI_API_KEY is not set — the proposer cannot run")
-        client = genai.Client(api_key=key)
+    `as_of` restricts retrieved context to what was published before that moment, which is
+    what makes a backtest a backtest rather than a demonstration of hindsight.
 
+    The model call goes through `providers.complete_json`, which is the seam to patch in a
+    test and the switch between hosted and local models."""
+    from . import providers
+
+    block, hits, note = macro_context(thesis, as_of=as_of)
     user = (f"{_context(views, allocation, capital_used)}\n"
-            f"NEW WORLDVIEW TO EXPRESS\n  {thesis.strip()}\n")
-    request = types.GenerateContentConfig(
-        system_instruction=system_prompt(thesis),
-        response_mime_type="application/json",
-        response_schema=gemini_schema(SCHEMA),
-        thinking_config=types.ThinkingConfig(thinking_level=config.THINKING_LEVEL),
-        max_output_tokens=config.MAX_TOKENS,
-    )
+            + (f"{block}\n\n" if block else "")
+            + f"NEW WORLDVIEW TO EXPRESS\n  {thesis.strip()}\n")
 
-    response, tried = None, []
-    for model in [config.MODEL] + config.FALLBACK_MODELS:
-        try:
-            response = client.models.generate_content(
-                model=model, contents=user, config=request)
-            if model != config.MODEL:
-                log.warning("proposed with fallback model %s", model)
-            break
-        except Exception as e:
-            # Only availability failures are worth another model. A 400 means the request
-            # itself is malformed and every model will say the same thing, so it must not be
-            # buried under a retry loop that ends in a vague "all models failed".
-            code = getattr(e, "code", None)
-            if code not in (429, 500, 503, 404):
-                raise ProposalError(f"{model} rejected the request: {e}")
-            tried.append(f"{model} ({code})")
-            log.warning("%s unavailable (%s), trying the next model", model, code)
-    if response is None:
-        raise ProposalError("no model was available to propose with: " + ", ".join(tried))
-
-    _check_finished(response)
     try:
-        return json.loads(response.text)
-    except (json.JSONDecodeError, TypeError) as e:
-        raise ProposalError(f"could not read the model's proposal as JSON: {e}")
+        out = providers.complete_json(system_prompt(thesis, prices, mode), user,
+                                      schema_for(mode))
+    except providers.ProviderError as e:
+        raise ProposalError(str(e))
+    if not isinstance(out, dict):
+        raise ProposalError(f"the model returned {type(out).__name__}, not an object")
+
+    # Carried on the result so the approval message can show what the model was told, and
+    # say plainly when it was told nothing.
+    out["_context"] = [{"published": h["published"],
+                        "title": h["meta"].get("title") or h["text"][:110]} for h in hits]
+    out["_context_note"] = note
+    return out
 
 
 #: Reasons the model stopped that are NOT an answer. Each arrives as a normal 200 with a
@@ -311,7 +393,8 @@ def _check_finished(response) -> None:
     raise ProposalError(f"the model stopped without finishing ({name})")
 
 
-def _allocate(longs: list, shorts: list, weighting: str, budget: float) -> tuple:
+def _allocate(longs: list, shorts: list, weighting: str, budget: float,
+              vols: dict = None) -> tuple:
     """Turn per-leg weights into signed dollar notionals. This is the hedge ratio, and it is
     the whole reason a structure is more than a list of tickers.
 
@@ -343,8 +426,19 @@ def _allocate(longs: list, shorts: list, weighting: str, budget: float) -> tuple
         return [(sym, w / total) for sym, w in side]
 
     if not longs or not shorts:
+        # One-sided, but still multi-leg: the legs are weighted against each OTHER by the
+        # same risk axis. A basket of long DBC, XLE and GLD split by equal dollars is
+        # dominated by whichever is most volatile, which is not what "equal conviction"
+        # was meant to express.
         side, sign = (longs, 1.0) if longs else (shorts, -1.0)
-        return {sym: sign * budget * w for sym, w in split(side)}, ""
+        if weighting in ("equal_notional", "directional") or len(side) == 1:
+            return {sym: sign * budget * w for sym, w in split(side)}, ""
+        units = {sym: w / universe.risk_unit(sym, weighting, vols) for sym, w in split(side)}
+        total = sum(units.values())
+        axis = {"dv01_neutral": "duration", "beta_neutral": "beta",
+                "inverse_vol": "volatility"}[weighting]
+        return ({sym: sign * budget * u / total for sym, u in units.items()},
+                f"{weighting}: legs balanced on {axis}")
 
     if weighting in ("equal_notional", "directional"):
         out = {}
@@ -357,7 +451,7 @@ def _allocate(longs: list, shorts: list, weighting: str, budget: float) -> tuple
     # defaulting to 1.0 when an instrument has no risk on this axis — a missing duration
     # silently treated as one year would size a steepener as if SHY and TLT were the same.
     def dollars_per_risk(side):
-        return sum(w / universe.risk_unit(sym, weighting) for sym, w in split(side))
+        return sum(w / universe.risk_unit(sym, weighting, vols) for sym, w in split(side))
 
     k_long, k_short = dollars_per_risk(longs), dollars_per_risk(shorts)
     if k_long <= 0 or k_short <= 0:
@@ -368,9 +462,10 @@ def _allocate(longs: list, shorts: list, weighting: str, budget: float) -> tuple
     out = {}
     for members, sign in ((longs, 1.0), (shorts, -1.0)):
         for sym, w in split(members):
-            out[sym] = sign * risk * w / universe.risk_unit(sym, weighting)
+            out[sym] = sign * risk * w / universe.risk_unit(sym, weighting, vols)
 
-    axis = "duration" if weighting == "dv01_neutral" else "beta"
+    axis = {"dv01_neutral": "duration", "beta_neutral": "beta",
+            "inverse_vol": "volatility"}[weighting]
     gross_long = sum(v for v in out.values() if v > 0)
     gross_short = -sum(v for v in out.values() if v < 0)
     note = (f"{weighting}: each side carries {risk:,.0f} of {axis}-dollars "
@@ -378,13 +473,21 @@ def _allocate(longs: list, shorts: list, weighting: str, budget: float) -> tuple
     return out, note
 
 
-def size(thesis: str, raw: dict, prices: dict, budget: float) -> Proposal:
+def size(thesis: str, raw: dict, prices: dict, budget: float,
+         vols: dict = None) -> Proposal:
     """Turn a structure and its weights into whole-share quantities.
 
-    Rounding toward zero is deliberate: rounding a leg UP spends more of the sleeve than you
-    approved, and six such roundings compound into a book meaningfully larger than the one
-    on screen. A leg the budget cannot buy a single share of is DROPPED and reported —
-    silently shrinking it to zero would show you a hedge that is not actually there."""
+    ETFs are sized fractionally, so a leg lands on its intended notional instead of being
+    truncated down to a whole share — which on an expensive name like GLD threw away a
+    meaningful slice of the position and quietly unbalanced every hedge ratio it was part of.
+
+    FUTURES ARE ALWAYS WHOLE CONTRACTS. There is no such thing as 0.4 of a contract, and an
+    order for one is rejected at the broker rather than rounded, so those still truncate
+    toward zero: rounding a contract UP spends more of the sleeve than you approved, and on
+    a $107,000 note future that is not a rounding error, it is a position.
+
+    A leg the budget cannot afford at all is DROPPED and reported — silently shrinking it to
+    zero would show you a hedge that is not actually there."""
     structure = raw.get("structure", "custom")
 
     # The playbook's weighting wins over the model's. The library is the written-down
@@ -404,7 +507,9 @@ def size(thesis: str, raw: dict, prices: dict, budget: float) -> Proposal:
         return Proposal(thesis=thesis, structure=structure, weighting=weighting,
                         reasoning=raw.get("reasoning", ""), legs=(),
                         conflicts=raw.get("conflicts", ""),
-                        confidence=raw.get("confidence", "low"), budget=budget)
+                        confidence=raw.get("confidence", "low"), budget=budget,
+                        context=tuple(raw.get("_context") or ()),
+                        context_note=raw.get("_context_note", ""))
 
     entries = raw.get("legs") or []
     if len(entries) > config.MAX_LEGS:
@@ -427,42 +532,103 @@ def size(thesis: str, raw: dict, prices: dict, budget: float) -> Proposal:
         (longs if entry["direction"] == "long" else shorts).append(
             (instrument.symbol, weight))
 
-    notionals, hedge_note = _allocate(longs, shorts, weighting, budget)
+    # Allocate, then check every FUTURES leg can afford at least one contract at the share
+    # it was given. A leg that cannot is SUBSTITUTED for its ETF equivalent and the whole
+    # structure is re-allocated — the ETF has a different volatility and duration, so
+    # swapping after the fact would leave the hedge ratio computed for an instrument no
+    # longer in the trade. Re-allocating is the only way the ratio stays true.
+    #
+    # Substitution is not the same concession as dropping a leg. It keeps the underlying,
+    # the direction and the leg's place in the structure; only the fee and roll profile
+    # change. Dropping would turn a pair into an outright.
+    swaps = {}
+    for _ in range(len(longs) + len(shorts) + 1):        # each pass fixes >=1 leg
+        notionals, hedge_note = _allocate(longs, shorts, weighting, budget, vols)
+        unaffordable = {}
+        for symbol, notional in notionals.items():
+            inst = universe.resolve(symbol)
+            if inst.sec_type != "FUT":
+                continue
+            unit = inst.notional(prices[symbol])
+            if abs(notional) < unit and inst.etf_equivalent:
+                unaffordable[symbol] = (inst, unit, abs(notional))
+        if not unaffordable:
+            break
+        for symbol, (inst, unit, got) in unaffordable.items():
+            swaps[symbol] = inst.etf_equivalent
+            entry = by_symbol.pop(symbol)
+            # The rationale was written about the FUTURE. Left alone it reads absurdly on
+            # the replacement — "micro WTI, avoiding USO's roll drag" attached to a USO leg.
+            entry = dict(entry, rationale=(entry.get("rationale", "") +
+                                           f" [written for {symbol}]").strip())
+            by_symbol[inst.etf_equivalent] = entry
+            longs = [(inst.etf_equivalent if s == symbol else s, w) for s, w in longs]
+            shorts = [(inst.etf_equivalent if s == symbol else s, w) for s, w in shorts]
+    else:
+        notionals, hedge_note = _allocate(longs, shorts, weighting, budget, vols)
+
+    substituted = tuple(
+        f"{f} -> {e} (one {f} contract is "
+        f"${universe.resolve(f).notional(prices[f]):,.0f}, more than this leg's share)"
+        for f, e in swaps.items())
     if override:
         hedge_note = f"{override}; {hedge_note}" if hedge_note else override
 
     legs, dropped = [], []
     for symbol, notional in notionals.items():
-        price = prices[symbol]                      # a KeyError here is a bug, not bad input
-        quantity = float(int(notional / price))     # int() truncates toward zero, both signs
+        instrument = universe.resolve(symbol)
+        price = prices[symbol]                   # a KeyError here is a bug, not bad input
+        unit = instrument.notional(price)        # price * multiplier — the cost of ONE unit
+        if instrument.sec_type == "FUT" or not config.FRACTIONAL:
+            quantity = float(int(notional / unit))    # truncates toward zero, both signs
+        else:
+            # Truncate at the fractional precision rather than round. round() can go UP,
+            # which would spend fractionally more of the sleeve than was approved and quietly
+            # break the invariant that gross never exceeds the budget. The precision given up
+            # is ~$0.02 on a $400 share; the invariant is worth more than that.
+            scale = 10 ** config.FRACTIONAL_DP
+            quantity = int(notional / unit * scale) / scale
         if quantity == 0:
-            dropped.append(f"{symbol} (${abs(notional):,.0f} does not buy one share "
-                           f"at ${price:,.2f})")
+            what = "contract" if instrument.sec_type == "FUT" else "share"
+            dropped.append(f"{symbol} (${abs(notional):,.0f} does not buy one {what} "
+                           f"at ${unit:,.0f})")
             continue
         legs.append(ProposedLeg(symbol=symbol, quantity=quantity, entry_price=price,
-                                notional=notional,
+                                notional=notional, multiplier=instrument.multiplier,
                                 rationale=by_symbol[symbol].get("rationale", "")))
 
-    # A dropped leg in a risk-matched structure is not a smaller version of the trade — it
-    # is a different one. Losing a wing turns a butterfly into a steepener, and losing the
-    # short leg of a pair leaves an outright. Refuse rather than quietly reshaping it.
-    if dropped and weighting in ("dv01_neutral", "beta_neutral"):
+    # A dropped leg in a MULTI-LEG structure is not a smaller version of the trade — it is a
+    # different one. Losing a wing turns a butterfly into a steepener; losing the long side
+    # of a pair leaves a naked outright pointing the other way.
+    #
+    # This once checked only dv01_neutral and beta_neutral, and an inverse_vol proposal walked
+    # straight through it: long MGC + MCL against short UUP put so few dollars on the volatile
+    # commodity side that neither contract was affordable, both legs were dropped, and what
+    # survived was a naked short-dollar position under a name that said "long gold and crude".
+    # The axis was never the point — ANY structure minus a leg is a different structure.
+    if dropped and len(entries) > 1:
+        surviving = ", ".join(f"{l.symbol} {'long' if l.quantity > 0 else 'short'}"
+                              for l in legs) or "nothing"
         raise ProposalError(
-            f"a {weighting} structure cannot be built at a ${budget:,.0f} budget — "
-            f"{'; '.join(dropped)}. The remaining legs would be a different trade, "
-            f"not a smaller one. Raise the size.")
+            f"this {len(entries)}-leg structure cannot be built at a ${budget:,.0f} budget "
+            f"— {'; '.join(dropped)}. That would leave {surviving}, which is a different "
+            f"trade, not a smaller one. Raise the size, or use ETF legs instead of futures.")
 
     if not legs:
+        why = f" — {'; '.join(dropped)}" if dropped else ""
         raise ProposalError(
-            f"the whole structure rounded to nothing at a ${budget:,.0f} budget — "
-            f"raise the size, or the sleeve's allocation")
+            f"the whole structure rounded to nothing at a ${budget:,.0f} budget{why}. "
+            f"Raise the size, or use a smaller-denomination instrument.")
 
-    legs.sort(key=lambda l: (-abs(l.quantity * l.entry_price), l.symbol))
+    legs.sort(key=lambda l: (-l.risk, l.symbol))
     return Proposal(thesis=thesis, structure=structure, weighting=weighting,
                     reasoning=raw.get("reasoning", ""), legs=tuple(legs),
                     conflicts=raw.get("conflicts", ""),
                     confidence=raw.get("confidence", "medium"), budget=budget,
-                    hedge_note=hedge_note, dropped=tuple(dropped))
+                    hedge_note=hedge_note, dropped=tuple(dropped),
+                    substituted=substituted,
+                    context=tuple(raw.get("_context") or ()),
+                    context_note=raw.get("_context_note", ""))
 
 
 #: How much of the sleeve a view gets before the remaining-capital clamp. Conviction scales

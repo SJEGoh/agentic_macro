@@ -21,7 +21,7 @@ import argparse
 import logging
 import sys
 
-from . import config, playbooks, prices, proposer
+from . import config, playbooks, prices, proposer, universe
 from .executor.executor_client import ExecutorClient, ExecutorRejected, ExecutorUnreachable
 from .store import Store
 
@@ -29,9 +29,14 @@ log = logging.getLogger("agentic-macro.cli")
 
 
 def _propose(args, store: Store) -> int:
-    if args.dry_run:
-        allocation = float(config.__dict__.get("DRY_RUN_CAPITAL", 0)) or 100_000.0
-        views, used = store.active(), 0.0
+    if args.dry_run or config.PAPER:
+        # Same number the bot quotes, so a dry run and a Telegram proposal size the same
+        # view identically. Two different default capitals would make the CLI a poor
+        # rehearsal for the thing that actually trades.
+        allocation = config.PAPER_CAPITAL
+        views = store.active()
+        held = store.net_positions()
+        used = sum(v.gross(prices.fetch(held.keys()) if held else {}) for v in views)
     else:
         client = ExecutorClient(strategy_id=config.STRATEGY_ID)
         client.preflight()
@@ -45,8 +50,12 @@ def _propose(args, store: Store) -> int:
                  allocation * config.MAX_WORLDVIEW_WEIGHT,
                  allocation * config.MAX_GROSS_WEIGHT - used)
 
-    symbols = [leg["symbol"] for leg in (raw.get("legs") or [])]
-    proposal = proposer.size(args.thesis, raw, prices.fetch(symbols) if symbols else {}, budget)
+    symbols = universe.with_fallbacks(
+        [leg["symbol"] for leg in (raw.get("legs") or [])])
+    series = prices.bars(symbols) if symbols else {}
+    proposal = proposer.size(args.thesis, raw,
+                             {s: v[-1][1] for s, v in series.items()}, budget,
+                             prices.realized_vol(symbols, series=series) if symbols else {})
 
     from .bot import _render
     print(_render(proposal, allocation, used, token="<cli>"))
@@ -124,6 +133,24 @@ def _diagnose(args, store: Store) -> int:
     return 0
 
 
+def _news(args, store: Store) -> int:
+    from .bot import cmd_news
+    print(cmd_news(args.query or [], {}))
+    return 0
+
+
+def _ingest(args, store: Store) -> int:
+    from .bot import cmd_ingest
+    print(cmd_ingest([], {}))
+    return 0
+
+
+def _universe(args, store: Store) -> int:
+    from .bot import cmd_universe
+    print(cmd_universe([args.what] if args.what else [], {}))
+    return 0
+
+
 def _playbooks(args, store: Store) -> int:
     print(playbooks.catalogue(args.thesis or ""))
     return 0
@@ -157,6 +184,17 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("diagnose", help="why is the bot not seeing my messages?")
     p.set_defaults(func=_diagnose)
+
+    p = sub.add_parser("news", help="what the macro memory holds / would retrieve")
+    p.add_argument("query", nargs="*")
+    p.set_defaults(func=_news)
+
+    p = sub.add_parser("ingest", help="pull recent news into the macro memory")
+    p.set_defaults(func=_ingest)
+
+    p = sub.add_parser("universe", help="the instruments, and what one unit costs")
+    p.add_argument("what", nargs="?", help="a symbol or a bucket")
+    p.set_defaults(func=_universe)
 
     p = sub.add_parser("playbooks", help="the structures available")
     p.add_argument("thesis", nargs="?", help="rank them against a view")

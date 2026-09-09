@@ -21,6 +21,42 @@ load_dotenv()
 #: Register it with `/addstrategy agentic_macro 100k` in the executor's control bot.
 STRATEGY_ID = os.environ.get("AGENTIC_STRATEGY_ID", "agentic_macro")
 
+# --------------------------------------------------------------------------- providers
+#: Where each kind of model call goes. Two switches rather than one, because the two have
+#: very different risk: embeddings are safe to run locally (the news corpus, not the
+#: embedding model, is what limits retrieval here), while the chat model chooses the
+#: structure and a weaker one fails by producing a PLAUSIBLE wrong answer that every guard
+#: downstream then faithfully executes.
+LLM_PROVIDER = os.environ.get("AGENTIC_LLM_PROVIDER", "gemini").strip().lower()
+EMBED_PROVIDER = os.environ.get("AGENTIC_EMBED_PROVIDER", "gemini").strip().lower()
+
+def _ollama_host() -> str:
+    """Normalise OLLAMA_HOST into something a CLIENT can connect to.
+
+    Ollama's own convention is a bind address — `0.0.0.0:11434`, no scheme — because the
+    variable configures the server. Handed to a client that means two broken things at once:
+    urllib rejects a URL with no scheme, and 0.0.0.0 is "listen on every interface", not an
+    address anything can connect to."""
+    raw = (os.environ.get("OLLAMA_HOST") or "http://localhost:11434").strip()
+    if "://" not in raw:
+        raw = "http://" + raw
+    return raw.replace("://0.0.0.0", "://127.0.0.1").rstrip("/")
+
+
+OLLAMA_HOST = _ollama_host()
+OLLAMA_MODEL = os.environ.get("AGENTIC_OLLAMA_MODEL", "qwen3:14b")
+OLLAMA_EMBED_MODEL = os.environ.get("AGENTIC_OLLAMA_EMBED_MODEL", "nomic-embed-text")
+#: A local model prefills the whole system prompt (universe + 29 playbooks, ~8k tokens) on
+#: every call, so this is minutes-per-call territory on a laptop, not seconds.
+OLLAMA_TIMEOUT = float(os.environ.get("AGENTIC_OLLAMA_TIMEOUT", "600"))
+#: Must exceed the system prompt plus the context block, or the model silently sees a
+#: truncated universe and proposes from whatever survived the window.
+OLLAMA_NUM_CTX = int(os.environ.get("AGENTIC_OLLAMA_NUM_CTX", "16384"))
+OLLAMA_TEMPERATURE = float(os.environ.get("AGENTIC_OLLAMA_TEMPERATURE", "0.3"))
+#: Reasoning models (qwen3, deepseek-r1) accept think=true/false. None leaves it unset.
+_think = os.environ.get("AGENTIC_OLLAMA_THINK", "").strip().lower()
+OLLAMA_THINK = None if not _think else _think in ("1", "true", "yes", "on")
+
 # --------------------------------------------------------------------------- the model
 #: Gemini, via GEMINI_API_KEY. The default is the model actually verified to answer on this
 #: key with the response schema below; see FALLBACK_MODELS for why there is a list at all.
@@ -98,6 +134,24 @@ MAX_WORLDVIEW_WEIGHT = float(os.environ.get("AGENTIC_MAX_WORLDVIEW_WEIGHT", "0.3
 #: worth more than one you have to go and find in a log.
 MAX_GROSS_WEIGHT = float(os.environ.get("AGENTIC_MAX_GROSS_WEIGHT", "0.95"))
 
+#: Allow fractional share quantities on ETFs. Verified to survive the whole path: the
+#: executor's netting compares deltas against an epsilon rather than rounding, and
+#: build_order assigns `order.totalQuantity = intent["quantity"]` with no int cast, so a
+#: fractional size reaches IB intact.
+#:
+#: FUTURES ARE NEVER FRACTIONAL regardless of this flag — 0.4 contracts is not a thing you
+#: can own, and an order for one would be rejected at the broker rather than rounded.
+#:
+#: Turn this off if the IB account is not enabled for fractional trading; that entitlement
+#: is per-account, and without it IB rejects the order rather than rounding it for you.
+FRACTIONAL = (os.environ.get("AGENTIC_FRACTIONAL", "true").strip().lower()
+              in ("1", "true", "yes", "on"))
+
+#: Decimal places for a fractional quantity. Four is far finer than any sizing decision
+#: needs and keeps the number readable in a confirmation — sending 78.31415926 shares is
+#: noise dressed as precision.
+FRACTIONAL_DP = int(os.environ.get("AGENTIC_FRACTIONAL_DP", "4"))
+
 #: Most legs a single worldview may have. A view that needs fifteen instruments is not a
 #: view, it is an index.
 MAX_LEGS = int(os.environ.get("AGENTIC_MAX_LEGS", "6"))
@@ -105,6 +159,59 @@ MAX_LEGS = int(os.environ.get("AGENTIC_MAX_LEGS", "6"))
 #: A price older than this is not a price. Weekends and holidays are handled by the caller
 #: asking for a range, not by trusting a stale quote.
 MAX_PRICE_AGE_DAYS = float(os.environ.get("AGENTIC_MAX_PRICE_AGE_DAYS", "5"))
+
+# --------------------------------------------------------------------------- memory
+#: Recent-news context the proposer retrieves before choosing a structure. Enrichment, not a
+#: dependency: when the store is empty or unreachable the proposal is made without it and
+#: SAYS SO, because a proposal that silently lost its context looks exactly like one that
+#: never had any.
+MEMORY_ENABLED = (os.environ.get("AGENTIC_MEMORY", "true").strip().lower()
+                  in ("1", "true", "yes", "on"))
+MEMORY_PATH = Path(os.environ.get("AGENTIC_MEMORY_PATH",
+                                  Path(__file__).resolve().parents[1] / "db" / "chroma"))
+MEMORY_COLLECTION = os.environ.get("AGENTIC_MEMORY_COLLECTION", "macro_memory")
+
+#: gemini-embedding-2 is Matryoshka-trained, so 768 of its 3072 dimensions keeps most of the
+#: retrieval quality at a quarter of the storage and distance cost.
+EMBED_MODEL = os.environ.get("AGENTIC_EMBED_MODEL", "gemini-embedding-2")
+EMBED_DIM = int(os.environ.get("AGENTIC_EMBED_DIM", "768"))
+
+#: Documents per embedding request. Each is sent as its own `Content` — a bare list of
+#: strings comes back as ONE blended vector (see memory.embed).
+MEMORY_BATCH = int(os.environ.get("AGENTIC_MEMORY_BATCH", "64"))
+MEMORY_RECALL_K = int(os.environ.get("AGENTIC_MEMORY_RECALL_K", "6"))
+#: Candidates pulled per returned hit before age-decay re-ranking. The index searches on
+#: similarity alone, so a fresh item only gets the chance to outrank a stale one if it was
+#: fetched in the first place.
+MEMORY_OVERFETCH = int(os.environ.get("AGENTIC_MEMORY_OVERFETCH", "8"))
+#: Hard age backstop, in days. Decay already makes anything this old unable to compete; this
+#: exists so the index does not accumulate forever.
+MEMORY_MAX_AGE_DAYS = float(os.environ.get("AGENTIC_MEMORY_MAX_AGE_DAYS", "180"))
+#: The free tier allows 100 embed requests per minute and tells you how long to wait, so a
+#: 429 during an ingest is worth sitting out rather than abandoning the batch.
+MEMORY_RETRIES = int(os.environ.get("AGENTIC_MEMORY_RETRIES", "5"))
+MEMORY_INGEST_LIMIT = int(os.environ.get("AGENTIC_MEMORY_INGEST_LIMIT", "400"))
+#: Keep only macro-relevant articles. Measured on 25,000 articles from this feed, ~90% are
+#: single-stock press releases; storing them means a query about the yield curve retrieves
+#: "Carnival's record booking curve" and presents it to the model as retrieved evidence.
+MEMORY_MACRO_ONLY = (os.environ.get("AGENTIC_MEMORY_MACRO_ONLY", "true").strip().lower()
+                     in ("1", "true", "yes", "on"))
+#: Articles scanned per ingest. Much larger than what is kept, because the filter is the
+#: whole point.
+MEMORY_SCAN_LIMIT = int(os.environ.get("AGENTIC_MEMORY_SCAN_LIMIT", "6000"))
+
+#: Build the news store on startup when it is empty or stale, and refresh it periodically.
+#: A container that comes up with an empty store otherwise proposes without context
+#: indefinitely, and says so on every proposal — visible, but nobody reads a working bot's
+#: logs until something is wrong.
+MEMORY_AUTO_INGEST = (os.environ.get("AGENTIC_MEMORY_AUTO_INGEST", "true").strip().lower()
+                      in ("1", "true", "yes", "on"))
+#: Days of history to pull when bootstrapping an empty store.
+MEMORY_BOOTSTRAP_DAYS = float(os.environ.get("AGENTIC_MEMORY_BOOTSTRAP_DAYS", "14"))
+#: How often to top it up. 0 disables the refresh but leaves the bootstrap.
+MEMORY_REFRESH_HOURS = float(os.environ.get("AGENTIC_MEMORY_REFRESH_HOURS", "6"))
+#: Below this the store counts as empty and gets bootstrapped.
+MEMORY_MIN_DOCS = int(os.environ.get("AGENTIC_MEMORY_MIN_DOCS", "25"))
 
 # --------------------------------------------------------------------------- storage
 DB_PATH = Path(os.environ.get("AGENTIC_DB_PATH",

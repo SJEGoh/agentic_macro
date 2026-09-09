@@ -151,7 +151,7 @@ PLAYBOOKS: tuple = (
         legs=(PlaybookLeg("the belly of the quality stack", ("LQD",), "long"),
               PlaybookLeg("risk-free wing", ("IEF",), "short"),
               PlaybookLeg("distressed wing", ("HYG",), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="quality is bid but the tail stays cheap — a late-cycle discrimination trade",
         fails_when="a broad risk-on rally lifts high yield hardest, or a default cycle takes "
                    "IG down with everything else",
@@ -180,7 +180,7 @@ PLAYBOOKS: tuple = (
                 "CREDIT cycle instead of accidentally trading rates.",
         legs=(PlaybookLeg("spread risk", ("HYG",), "long"),
               PlaybookLeg("duration-heavy IG", ("LQD",), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="growth holds up, defaults stay low, and the hunt for yield is on",
         fails_when="a genuine default cycle starts — HY gaps and does not trade on the way down",
     ),
@@ -192,7 +192,7 @@ PLAYBOOKS: tuple = (
                 "listed expression of a credit cycle turning, and it usually leads equities.",
         legs=(PlaybookLeg("spread risk", ("HYG",), "short"),
               PlaybookLeg("quality", ("LQD", "IEF"), "long")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="funding tightens, defaults rise, or a recession is being priced",
         fails_when="central banks backstop credit — the reversal is violent",
     ),
@@ -314,7 +314,7 @@ PLAYBOOKS: tuple = (
                 "the view is not about.",
         legs=(PlaybookLeg("china equity", ("FXI",), "long"),
               PlaybookLeg("the commodity transmission", ("XLB", "DBC", "EWZ"), "long")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="credit is eased and property stabilises",
         fails_when="stimulus is announced but not transmitted — a decade of false starts",
     ),
@@ -341,7 +341,7 @@ PLAYBOOKS: tuple = (
                 "right and hurt twice when wrong.",
         legs=(PlaybookLeg("short the dollar", ("UDN",), "long"),
               PlaybookLeg("what it lifts", ("GLD", "EEM", "DBC"), "long")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="the Fed cuts faster than peers, or the twin deficits get repriced",
         fails_when="a risk-off — the dollar is still the funding currency of last resort",
     ),
@@ -354,7 +354,7 @@ PLAYBOOKS: tuple = (
                 "positions are being closed — the classic non-linear risk-off hedge.",
         legs=(PlaybookLeg("funding currency", ("FXY",), "long"),
               PlaybookLeg("carry assets", ("EEM", "HYG"), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="a volatility shock forces deleveraging",
         fails_when="calm persists — you pay the carry you are shorting, every day",
     ),
@@ -369,7 +369,7 @@ PLAYBOOKS: tuple = (
                 "reinforce rather than hedge each other.",
         legs=(PlaybookLeg("real assets", ("DBC", "XLE", "XLB"), "long"),
               PlaybookLeg("nominal duration", ("TLT",), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="demand runs hot, supply is tight, or fiscal policy is loose",
         fails_when="the inflation is supply-driven and kills demand — see stagflation",
     ),
@@ -382,7 +382,7 @@ PLAYBOOKS: tuple = (
                 "gold), short what it taxes (the consumer, duration).",
         legs=(PlaybookLeg("the shock", ("DBC", "XLE", "GLD"), "long"),
               PlaybookLeg("what it taxes", ("XLY", "TLT"), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="a genuine supply constraint — energy, tariffs, war",
         fails_when="the shock passes through quickly and demand destruction wins",
     ),
@@ -407,7 +407,7 @@ PLAYBOOKS: tuple = (
                 "loses money. XLE owns the cash flows instead.",
         legs=(PlaybookLeg("energy equities", ("XLE",), "long"),
               PlaybookLeg("crude, only with a near-term catalyst", ("USO",), "long")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="supply is disrupted with demand intact",
         fails_when="OPEC spare capacity absorbs it, or the price kills demand",
     ),
@@ -423,7 +423,7 @@ PLAYBOOKS: tuple = (
         legs=(PlaybookLeg("duration", ("TLT",), "long"),
               PlaybookLeg("defensives", ("XLP", "XLV"), "long"),
               PlaybookLeg("credit and cyclical risk", ("HYG", "IWM"), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="labour cracks and credit tightens together",
         fails_when="the landing is soft — every leg loses at once",
     ),
@@ -436,7 +436,7 @@ PLAYBOOKS: tuple = (
                 "premium that is no longer needed.",
         legs=(PlaybookLeg("rate-sensitive laggards", ("IWM", "XLY", "HYG"), "long"),
               PlaybookLeg("the haven premium", ("GLD", "XLP"), "short")),
-        weighting="equal_notional",
+        weighting="inverse_vol",
         works_when="disinflation continues and the labour market cools without cracking",
         fails_when="either half breaks — inflation resurprises, or growth rolls over",
     ),
@@ -457,8 +457,30 @@ PLAYBOOKS: tuple = (
 
 BY_NAME: dict = {p.name: p for p in PLAYBOOKS}
 
+#: How a structure's legs are balanced against each other.
+#:
+#:   dv01_neutral   duration-matched — curve trades, where the axis is the slope
+#:   beta_neutral   beta-matched — equity pairs, where the axis is the sector not the market
+#:   inverse_vol    risk-matched on realised volatility. The DEFAULT for multi-asset
+#:                  baskets: DBC, GLD and TLT sized by equal dollars is really a bet on
+#:                  whichever leg happens to be most volatile, because equal dollars in a
+#:                  50%-vol commodity and a 10%-vol bond is five times the risk in one leg
+#:   equal_notional dollar-matched. Available, but rarely what is meant
+#:   directional    a single-leg outright, where there is nothing to balance against
 WEIGHTINGS: frozenset = frozenset(
-    {"dv01_neutral", "beta_neutral", "equal_notional", "directional"})
+    {"dv01_neutral", "beta_neutral", "inverse_vol", "equal_notional", "directional"})
+
+#: Weightings that deliberately cancel the dominant factor. A DV01-neutral steepener is
+#: built to be neutral to the LEVEL of rates, and a beta-neutral pair to the level of the
+#: market — which is exactly what a CPI print or a payrolls number mostly moves. Excellent
+#: for a view held over weeks; the wrong instrument for a forty-minute repricing.
+NEUTRALISING = frozenset({"dv01_neutral", "beta_neutral"})
+
+
+def directional_names() -> list:
+    """Structures whose P&L comes from the level rather than from a spread."""
+    return [p.name for p in PLAYBOOKS if p.weighting not in NEUTRALISING]
+
 
 _WORD = re.compile(r"[a-z0-9]+")
 

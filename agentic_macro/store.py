@@ -21,12 +21,15 @@ wholly absent — a half-written view would net into a book nobody approved.
 """
 from __future__ import annotations
 
+import logging
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import NamedTuple
 
 from . import config
+
+log = logging.getLogger("agentic-macro.store")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS worldviews (
@@ -45,6 +48,7 @@ CREATE TABLE IF NOT EXISTS legs (
     quantity     REAL    NOT NULL,
     entry_price  REAL    NOT NULL,
     rationale    TEXT    NOT NULL DEFAULT '',
+    multiplier   REAL    NOT NULL DEFAULT 1.0,
     PRIMARY KEY (worldview_id, symbol)
 );
 CREATE INDEX IF NOT EXISTS idx_worldviews_status ON worldviews(status);
@@ -56,6 +60,14 @@ class Leg(NamedTuple):
     quantity: float
     entry_price: float
     rationale: str = ""
+    #: Contract multiplier AS TRADED. Stored rather than looked up so the recorded book stays
+    #: self-describing: if a multiplier in universe.py is ever corrected, the gross of a
+    #: position taken under the old number does not silently change underneath the record.
+    multiplier: float = 1.0
+
+    @property
+    def unit_value(self) -> float:
+        return self.entry_price * self.multiplier
 
 
 class Worldview(NamedTuple):
@@ -72,7 +84,7 @@ class Worldview(NamedTuple):
         entry prices otherwise. Gross rather than net because a long/short pair consumes
         capital on both sides; netting them to zero would report a paired trade as free."""
         return sum(abs(l.quantity) * float((prices or {}).get(l.symbol, l.entry_price))
-                   for l in self.legs)
+                   * l.multiplier for l in self.legs)
 
 
 def _now() -> str:
@@ -89,6 +101,16 @@ class Store:
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.execute("PRAGMA journal_mode = WAL")
         self.conn.executescript(SCHEMA)
+        self._migrate()
+
+    def _migrate(self) -> None:
+        """Additive migrations for databases created before a column existed. A worldview
+        written under the old schema must keep working — it holds real positions."""
+        have = {r[1] for r in self.conn.execute("PRAGMA table_info(legs)")}
+        if "multiplier" not in have:
+            self.conn.execute(
+                "ALTER TABLE legs ADD COLUMN multiplier REAL NOT NULL DEFAULT 1.0")
+            log.info("migrated: legs.multiplier added (existing rows default to 1.0)")
 
     def close(self) -> None:
         self.conn.close()
@@ -102,7 +124,8 @@ class Store:
         book does not know about, and the next submission — being authoritative — would
         close them without ever saying so."""
         legs = [Leg(l.symbol.upper(), float(l.quantity), float(l.entry_price),
-                    getattr(l, "rationale", "")) for l in legs]
+                    getattr(l, "rationale", ""), float(getattr(l, "multiplier", 1.0) or 1.0))
+                for l in legs]
         with self.conn:
             self.conn.execute("BEGIN")
             cur = self.conn.execute(
@@ -111,9 +134,38 @@ class Store:
                 (thesis, reasoning, _now(), created_by))
             wid = cur.lastrowid
             self.conn.executemany(
-                "INSERT INTO legs (worldview_id, symbol, quantity, entry_price, rationale) "
-                "VALUES (?, ?, ?, ?, ?)",
-                [(wid, l.symbol, l.quantity, l.entry_price, l.rationale) for l in legs])
+                "INSERT INTO legs (worldview_id, symbol, quantity, entry_price, rationale, "
+                "multiplier) VALUES (?, ?, ?, ?, ?, ?)",
+                [(wid, l.symbol, l.quantity, l.entry_price, l.rationale, l.multiplier)
+                 for l in legs])
+        return self.get(wid)
+
+    def replace_legs(self, wid: int, legs) -> Worldview:
+        """Swap a worldview's legs for a new set, atomically.
+
+        Used by /resize and /adjust. The thesis and its reasoning are untouched — the view
+        has not changed, only how much of it you are holding. Entry prices are carried over
+        for symbols already held, because entry price records when the view was OPENED; a
+        resize is a change of size, not a new position with a new cost basis.
+
+        All-or-nothing: a half-replaced set of legs would net into a book nobody approved,
+        and the next submission would make it real."""
+        view = self.get(wid)
+        if view is None:
+            raise KeyError(f"no worldview #{wid}")
+        if view.status != "active":
+            raise ValueError(f"worldview #{wid} is closed — reopen it or open a new one")
+        rows = [Leg(l.symbol.upper(), float(l.quantity), float(l.entry_price),
+                    getattr(l, "rationale", ""), float(getattr(l, "multiplier", 1.0) or 1.0))
+                for l in legs if l.quantity]
+        with self.conn:
+            self.conn.execute("BEGIN")
+            self.conn.execute("DELETE FROM legs WHERE worldview_id=?", (wid,))
+            self.conn.executemany(
+                "INSERT INTO legs (worldview_id, symbol, quantity, entry_price, rationale, "
+                "multiplier) VALUES (?, ?, ?, ?, ?, ?)",
+                [(wid, l.symbol, l.quantity, l.entry_price, l.rationale, l.multiplier)
+                 for l in rows])
         return self.get(wid)
 
     def close_worldview(self, wid: int, closed_by: str = "") -> Worldview:
@@ -148,14 +200,14 @@ class Store:
 
     def _hydrate(self, row) -> Worldview:
         legs = self.conn.execute(
-            "SELECT symbol, quantity, entry_price, rationale FROM legs "
+            "SELECT symbol, quantity, entry_price, rationale, multiplier FROM legs "
             "WHERE worldview_id=? ORDER BY symbol", (row["id"],)).fetchall()
         return Worldview(
             id=row["id"], thesis=row["thesis"], reasoning=row["reasoning"],
             status=row["status"], created_at=row["created_at"],
             created_by=row["created_by"],
-            legs=tuple(Leg(l["symbol"], l["quantity"], l["entry_price"], l["rationale"])
-                       for l in legs))
+            legs=tuple(Leg(l["symbol"], l["quantity"], l["entry_price"], l["rationale"],
+                           l["multiplier"]) for l in legs))
 
     # ------------------------------------------------------------------ the netted book
     def net_positions(self, extra: list = None, exclude: int = None) -> dict:

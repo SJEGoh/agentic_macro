@@ -152,38 +152,78 @@ def test_non_positive_weight_is_rejected():
 
 
 # --------------------------------------------------------------------------- rounding
-def test_rounding_never_spends_more_than_the_budget():
-    """Truncation toward zero, on BOTH signs. Rounding up would overspend the sleeve in the
-    same direction every time, and six legs of that is a book bigger than the one shown."""
+def test_sizing_never_spends_more_than_the_budget():
+    """Truncation toward zero, on BOTH signs, fractional or not. Rounding UP would overspend
+    the sleeve in the same direction on every leg, and six legs of that is a book bigger than
+    the one shown — which is exactly what the approval was supposed to fix."""
     for budget in (10_000.0, 33_333.0, 97_531.0, 250_000.0):
         p = proposer.size("x", raw("custom", "equal_notional",
                                    [("SPY", "long", 1), ("TLT", "short", 1),
                                     ("GLD", "long", 1)]), PRICES, budget)
         assert p.gross() <= budget, f"overspent at budget {budget}"
         for leg in p.legs:
-            assert leg.quantity == int(leg.quantity), "fractional shares are not tradeable"
-            assert abs(leg.quantity * leg.entry_price) <= abs(leg.notional) + 1e-6
+            assert abs(leg.risk) <= abs(leg.notional) + 1e-6
 
 
-def test_short_leg_rounds_toward_zero_too():
-    """int() truncates toward zero for negatives as well; a floor() here would round a
+def test_fractional_sizing_lands_much_closer_to_the_intended_notional():
+    """The point of fractional. GLD at $250 truncated to whole shares threw away up to $250
+    of a leg, which on a small budget is a large slice of the position AND unbalances every
+    hedge ratio the leg is part of."""
+    p = proposer.size("x", raw("gold_debasement", "directional", [("GLD", "long", 1)]),
+                      PRICES, 9_937.0)               # deliberately not a multiple of $250
+    leg = p.legs[0]
+    assert leg.quantity != int(leg.quantity), "expected a fractional quantity"
+    assert p.gross() == pytest.approx(9_937.0, rel=1e-4)
+
+    # whole shares would have left $187 of the leg unspent — 1.9% of it
+    whole = proposer.size("x", raw("gold_debasement", "directional", [("GLD", "long", 1)]),
+                          {"GLD": 250.0}, 9_937.0)
+    assert leg.quantity > int(leg.quantity) >= 39
+
+
+def test_a_short_leg_truncates_toward_zero_too():
+    """Truncation must go toward zero for negatives as well; a floor() here would take a
     short leg AWAY from zero and silently oversize every short in the sleeve."""
     p = proposer.size("x", raw("custom", "equal_notional", [("TLT", "short", 1)]),
                       PRICES, 10_000.0)
     leg = p.legs[0]
-    assert leg.quantity == -113          # 10000/88 = 113.6 -> 113, not 114
+    assert leg.quantity < 0
     assert abs(leg.quantity * leg.entry_price) <= 10_000.0
 
 
+def test_futures_are_never_fractional_even_though_etfs_are():
+    """0.4 contracts is not a position you can hold; IB rejects the order rather than
+    rounding it. This is the one place the fractional flag must not reach."""
+    p = proposer.size("x", raw("long_duration", "directional", [("ZN", "long", 1)]),
+                      {"ZN": 107.44}, 500_000.0)
+    assert p.legs[0].quantity == int(p.legs[0].quantity)
+    assert p.legs[0].quantity == 4
+
+
 # --------------------------------------------------------------------------- degradation
-def test_unaffordable_leg_in_a_risk_matched_structure_refuses():
-    """A butterfly that cannot afford a wing is a steepener, not a small butterfly.
-    Silently dropping the leg would place a structurally different trade under the name
-    that was approved."""
-    with pytest.raises(proposer.ProposalError, match="different trade"):
-        proposer.size("x", raw("curve_butterfly", "dv01_neutral",
+def test_an_unaffordable_futures_wing_falls_back_rather_than_reshaping():
+    """A butterfly that cannot afford a wing is a steepener, not a small butterfly. Silently
+    dropping the leg would place a structurally different trade under the name approved.
+
+    Fractional sizing means an ETF leg is essentially never unaffordable, and futures now
+    fall back to their ETF equivalent — so this structure survives as a three-legged fly in
+    ETFs rather than being reshaped into something else."""
+    p = proposer.size("x", raw("curve_butterfly", "dv01_neutral",
+                               [("ZF", "long", 1), ("ZT", "short", 1), ("ZB", "short", 1)]),
+                      {"ZT": 102.56, "ZF": 105.52, "ZB": 108.75,
+                       "IEF": 95.0, "SHY": 82.0, "TLT": 88.0}, 400_000.0)
+    assert len(p.legs) == 3, "the fly lost a wing instead of falling back to ETFs"
+    assert p.substituted, "expected an ETF substitution"
+
+
+def test_an_etf_structure_is_no_longer_broken_by_a_small_budget():
+    """The other side of the same coin: what used to refuse at $500 now sizes cleanly,
+    because a fraction of a share is a real position."""
+    p = proposer.size("x", raw("curve_butterfly", "dv01_neutral",
                                [("IEF", "long", 1), ("SHY", "short", 1), ("TLT", "short", 1)]),
                       PRICES, 500.0)
+    assert len(p.legs) == 3
+    assert p.gross() <= 500.0
 
 
 def test_inexpressible_view_yields_no_legs_rather_than_a_guess():

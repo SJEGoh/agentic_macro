@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import logging
 
-from . import config, prices
+from . import config, prices, universe
 from .executor.remote_strategy import RemoteStrategy, StrategyError
 from .store import Store
 
@@ -36,9 +36,9 @@ class MacroSleeve(RemoteStrategy):
     """The discretionary macro sleeve: whatever the active worldviews add up to."""
 
     strategy_id = config.STRATEGY_ID
-    #: Equities and ETFs only, so there is nothing to submit while the market is shut. The
-    #: executor would reject a pooled equity book with a 409 anyway; skipping cleanly here
-    #: turns that into an exit 0 "not now" instead of a failure that pages someone.
+    #: The book can hold futures, but it is usually mixed, and the executor rejects a pooled
+    #: book containing equities while the equity market is shut. Skipping cleanly here turns
+    #: that into an exit 0 "not now" rather than a 409 someone has to go and read.
     require_market_open = True
 
     def __init__(self, store: Store = None, **kwargs):
@@ -59,10 +59,20 @@ class MacroSleeve(RemoteStrategy):
             return []
 
         self.last_prices = prices.fetch(targets.keys())
-        book = [self.intent(symbol, quantity, self.last_prices[symbol])
-                for symbol, quantity in sorted(targets.items())]
+        book = []
+        for symbol, quantity in sorted(targets.items()):
+            inst = universe.resolve(symbol)
+            # A futures leg MUST carry its multiplier: without it the executor's netting
+            # values the contract at its bare price, understating notional by up to 1,000x
+            # and letting the order through a cap it should have breached.
+            book.append(self.intent(
+                symbol, quantity, self.last_prices[symbol],
+                sec_type=inst.sec_type, exchange=inst.exchange,
+                asset_class="future" if inst.sec_type == "FUT" else "equity",
+                multiplier=inst.multiplier if inst.sec_type == "FUT" else None))
 
-        gross = sum(abs(i["target_quantity"]) * i["expected_price"] for i in book)
+        gross = sum(abs(i["target_quantity"]) * i["expected_price"]
+                    * (i["instrument"].get("multiplier") or 1.0) for i in book)
         cap = capital * config.MAX_GROSS_WEIGHT
         if gross > cap:
             # Local check before the executor's. Its cap is the one that protects the

@@ -1,0 +1,106 @@
+{
+ "2026-09-11T12:30:00+00:00": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The CPI release is a direct inflation signal. A breakeven_widener (long TIP, short IEF) isolates inflation expectations by neutralizing real rate levels. Recent context (oil prices, tariffs, Trumpflation) suggests inflation risks are priced in, but a surprise upward move in CPI would widen breakevens, benefiting this structure. The trade is directional on inflation, not duration, and fits the event's focus.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2026-09-08",
+    "title": "Pre-Market in Red"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Stock Market Today, Sept. 8: Stocks Slide Amid Surging Oil Prices, Persistent Geopolotical Tenisons"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Crypto Market Today, Sept. 8: Bitcoin Slides as Fed Hike Odds Pass 60%"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Canadian Tariffs Hit $20B in U.S. Imports"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "3 Crypto-Exposed Stocks Riding the Institutional Crypto Wave"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Trumpflation Is a Problem for Fed Chair Kevin Warsh, but It's Not the Only Serious Inflationary Threat"
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 432.3795,
+    "price": 107.05,
+    "notional": 46286.225475
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -447.198,
+    "price": 92.16,
+    "notional": -41213.76768
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-09-11T08:30:00-04:00",
+  "recorded_at": "2026-09-09T04:53:02.038123+00:00",
+  "arm": "forward"
+ },
+ "2026-09-16T18:00:00+00:00": {
+  "expressible": true,
+  "structure": "short_duration",
+  "weighting": "directional",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision is likely to influence rate expectations. With current market pricing already reflecting a >60% chance of a hike, the structure bets on further rate increases (higher yields) by shorting long-duration assets like TLT/IEF. This aligns with the context of persistent inflationary pressures (Trumpflation, oil prices) and geopolitical risks, which may justify a hawkish outcome. The structure directly expresses 'yields rise' via short duration, which would profit if the Fed delivers a tighter policy than priced in.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2026-09-08",
+    "title": "Crypto Market Today, Sept. 8: Bitcoin Slides as Fed Hike Odds Pass 60%"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Pre-Market in Red"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Is Realty Income's 5.3% Yield Still Compelling? Buy or Hold the Stock?"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Stock Market Today, Sept. 8: Stocks Slide Amid Surging Oil Prices, Persistent Geopolotical Tenisons"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "3 Dividend Growth Stocks to Buy as Fed Expected to Keep Rates Higher"
+   },
+   {
+    "published": "2026-09-08",
+    "title": "Trumpflation Is a Problem for Fed Chair Kevin Warsh, but It's Not the Only Serious Inflationary Threat"
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "TLT",
+    "quantity": -709.6512,
+    "price": 82.2,
+    "notional": -58333.32864000001
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -316.4785,
+    "price": 92.16,
+    "notional": -29166.65856
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-09-16T14:00:00-04:00",
+  "recorded_at": "2026-09-09T04:56:16.072486+00:00",
+  "arm": "forward"
+ }
+}

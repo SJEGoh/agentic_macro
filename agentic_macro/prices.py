@@ -1,5 +1,5 @@
 """
-agentic_macro/prices.py — the one place a price comes from.
+agentic_macro/prices.py — the one place a price or a volatility comes from.
 
 `expected_price` is the single most load-bearing number in a book. The executor values each
 leg with it to apply the allocation cap, and measures fill slippage against it, so a stale,
@@ -7,20 +7,43 @@ missing or zero price mis-sizes the order AND the limit meant to contain it. Eve
 this module therefore fails closed: a symbol without a fresh, positive, finite price raises
 rather than returning a default, and the caller has no way to ask for "whatever you've got".
 
-Prices are fetched fresh at PROPOSAL time (to size the legs) and again at SUBMIT time (to
-value the book the executor receives). Quantities are frozen in between — see `store.py` —
-which is what makes an approval mean a fixed number of shares rather than a fixed dollar
-amount that drifts while you read it.
+Two providers, and which one is not a preference
+------------------------------------------------
+Massive is primary for equities and ETFs. Futures fall through to yfinance because this
+account is **not entitled to Massive's futures data** — `list_futures_products` answers
+"You are not entitled to this data", so there is nothing to fall back FROM. yfinance also
+covers an equity Massive fails on, which is the ordinary backup case.
+
+A provider that answers with a bad number is worse than one that does not answer, so the
+per-symbol result is validated before it counts as an answer; a symbol that fails validation
+falls through to the backup exactly like a symbol that was missing.
+
+Everything is keyed by the symbol the EXECUTOR uses ("ZN"), never the feed's ("ZN=F"). That
+translation lives here and nowhere else.
+
+Bars, not quotes
+----------------
+Both the price and the volatility come from the same daily bars, fetched once. Inverse-vol
+sizing needs a return series, and pulling it separately would double the API calls and let
+the price and the vol drift out of sync with each other.
 """
 from __future__ import annotations
 
+import datetime as dt
 import logging
 import math
-from datetime import datetime, timedelta, timezone
+import os
 
-from . import config
+from . import config, universe
 
 log = logging.getLogger("agentic-macro.prices")
+
+#: Trading days of history pulled. Enough for a 60-day vol with room for holidays.
+HISTORY_DAYS = int(os.environ.get("AGENTIC_HISTORY_DAYS", "120"))
+#: Lookback for realised volatility, in observations.
+VOL_LOOKBACK = int(os.environ.get("AGENTIC_VOL_LOOKBACK", "60"))
+#: Fewer returns than this and the vol estimate is noise pretending to be a risk number.
+VOL_MIN_OBS = int(os.environ.get("AGENTIC_VOL_MIN_OBS", "30"))
 
 
 class PriceUnavailable(RuntimeError):
@@ -42,57 +65,148 @@ def _check(symbol: str, price) -> float:
     return value
 
 
-def fetch(symbols) -> dict:
-    """{symbol: last close} for every symbol, or raise.
+# --------------------------------------------------------------------------- providers
+def _massive_bars(feed_symbols: list, days: int) -> dict:
+    """{feed symbol: [(date, close)]} from Massive. Never raises — a provider that cannot
+    answer returns what it has, and the caller falls through for the rest."""
+    out = {}
+    try:
+        from massive import RESTClient
+    except ImportError:
+        return out
+    key = os.environ.get("MASSIVE_API_KEY")
+    if not key:
+        return out
+
+    client = RESTClient(key)
+    end = dt.date.today()
+    start = end - dt.timedelta(days=int(days * 1.6) + 10)   # calendar days for trading days
+    for sym in feed_symbols:
+        try:
+            bars = [(dt.datetime.fromtimestamp(a.timestamp / 1000, dt.timezone.utc).date(),
+                     a.close)
+                    for a in client.list_aggs(sym, 1, "day", start.isoformat(),
+                                              end.isoformat(), limit=50_000)]
+            if bars:
+                out[sym] = sorted(bars)
+        except Exception as e:
+            log.debug("massive has no bars for %s: %s", sym, e)
+    return out
+
+
+def _yfinance_bars(feed_symbols: list, days: int) -> dict:
+    """{feed symbol: [(date, close)]} from yfinance. The backup, and the ONLY source for
+    futures on this account."""
+    out = {}
+    if not feed_symbols:
+        return out
+    try:
+        import yfinance as yf
+    except ImportError:
+        return out
+    try:
+        data = yf.download(feed_symbols, period=f"{int(days * 1.6) + 10}d", progress=False,
+                           auto_adjust=False, group_by="column", threads=True)
+    except Exception as e:
+        log.warning("yfinance download failed: %s", e)
+        return out
+    if data is None or data.empty:
+        return out
+
+    closes = data["Close"]
+    if len(feed_symbols) == 1 and closes.ndim == 1:      # yfinance drops the level for one
+        closes = closes.to_frame(feed_symbols[0])
+    for sym in feed_symbols:
+        if sym not in closes.columns:
+            continue
+        series = closes[sym].dropna()
+        if not series.empty:
+            out[sym] = [(i.date() if hasattr(i, "date") else i, float(v))
+                        for i, v in series.items()]
+    return out
+
+
+def bars(symbols, days: int = HISTORY_DAYS) -> dict:
+    """{executor symbol: [(date, close)]} for every symbol, or raise.
 
     All-or-nothing on purpose. A partially priced book would be submitted as an
     authoritative whole book with some legs missing, and `/targets` reads a missing name as
     "close it" — so a half-priced fetch would quietly flatten the legs it could not price.
     """
-    # Strip BEFORE testing for emptiness: a whitespace-only entry is truthy, and letting one
-    # through would send yfinance an empty ticker and get back a confusing failure instead
-    # of the "nothing to price" this is.
-    symbols = sorted({s.strip().upper() for s in symbols if s and s.strip()})
-    if not symbols:
+    wanted = []
+    for s in symbols:
+        if s and s.strip():
+            wanted.append(universe.resolve(s))
+    if not wanted:
         return {}
 
-    import yfinance as yf                      # imported here so --dry-run needs no network
+    # Futures skip Massive entirely — this account has no entitlement, so asking is just
+    # latency and a misleading log line.
+    equities = [i for i in wanted if i.sec_type != "FUT"]
+    got = _massive_bars([i.feed for i in equities], days) if equities else {}
 
-    # `period` is generous because a Monday morning fetch must still see Friday's close;
-    # staleness is then judged from the bar's own date, not from how much we asked for.
-    data = yf.download(symbols, period="10d", progress=False, auto_adjust=False,
-                       group_by="column", threads=True)
-    if data is None or data.empty:
-        raise PriceUnavailable(f"no price data returned for {', '.join(symbols)}")
+    missing = [i for i in wanted if not got.get(i.feed)]
+    if missing:
+        got.update(_yfinance_bars([i.feed for i in missing], days))
 
-    closes = data["Close"]
-    if len(symbols) == 1 and closes.ndim == 1:  # yfinance drops the column level for one name
-        closes = closes.to_frame(symbols[0])
-
-    cutoff = datetime.now(timezone.utc) - timedelta(days=config.MAX_PRICE_AGE_DAYS)
+    cutoff = dt.date.today() - dt.timedelta(days=config.MAX_PRICE_AGE_DAYS)
     out, problems = {}, []
-    for symbol in symbols:
-        if symbol not in closes.columns:
-            problems.append(f"{symbol}: no column in the price response")
+    for inst in wanted:
+        series = got.get(inst.feed)
+        if not series:
+            problems.append(f"{inst.symbol}: no price data from either provider")
             continue
-        series = closes[symbol].dropna()
-        if series.empty:
-            problems.append(f"{symbol}: no closing prices in the window")
-            continue
-
-        stamp = series.index[-1]
-        stamp = stamp.tz_localize("UTC") if stamp.tzinfo is None else stamp.tz_convert("UTC")
-        if stamp.to_pydatetime() < cutoff:
-            problems.append(f"{symbol}: last close is {stamp.date()}, older than "
+        last_date, last_close = series[-1]
+        if last_date < cutoff:
+            problems.append(f"{inst.symbol}: last close is {last_date}, older than "
                             f"{config.MAX_PRICE_AGE_DAYS:g} days")
             continue
         try:
-            out[symbol] = _check(symbol, series.iloc[-1])
+            _check(inst.symbol, last_close)
         except PriceUnavailable as e:
             problems.append(str(e))
+            continue
+        out[inst.symbol] = series
 
     if problems:
         raise PriceUnavailable("could not price this book:\n  " + "\n  ".join(problems))
+    return out
+
+
+def fetch(symbols, days: int = HISTORY_DAYS) -> dict:
+    """{executor symbol: last close}."""
+    return {s: series[-1][1] for s, series in bars(symbols, days).items()}
+
+
+def realized_vol(symbols, lookback: int = VOL_LOOKBACK, series: dict = None) -> dict:
+    """{executor symbol: annualised realised volatility} from daily log returns.
+
+    This is the risk unit an inverse-vol structure is weighted by, so it fails closed like a
+    price does: too few observations raises rather than returning a small number. A vol
+    estimated from six days would quietly hand the largest position to whichever leg happened
+    to be quiet that week — the exact opposite of what inverse-vol sizing is for.
+
+    Pass `series` to reuse bars already fetched, so the vol and the price describe the same
+    pull rather than two calls that can disagree."""
+    series = series if series is not None else bars(symbols)
+    out, problems = {}, []
+    for symbol, rows in series.items():
+        closes = [c for _, c in rows][-(lookback + 1):]
+        rets = [math.log(closes[i] / closes[i - 1])
+                for i in range(1, len(closes))
+                if closes[i] > 0 and closes[i - 1] > 0]
+        if len(rets) < VOL_MIN_OBS:
+            problems.append(f"{symbol}: only {len(rets)} usable returns, need {VOL_MIN_OBS}")
+            continue
+        mean = sum(rets) / len(rets)
+        var = sum((r - mean) ** 2 for r in rets) / (len(rets) - 1)
+        sigma = math.sqrt(var) * math.sqrt(252)
+        if not math.isfinite(sigma) or sigma <= 0:
+            problems.append(f"{symbol}: volatility came out {sigma!r}")
+            continue
+        out[symbol] = sigma
+    if problems:
+        raise PriceUnavailable("could not measure volatility:\n  " + "\n  ".join(problems))
     return out
 
 

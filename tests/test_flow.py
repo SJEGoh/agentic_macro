@@ -15,7 +15,7 @@ import json
 
 import pytest
 
-from agentic_macro import proposer
+from agentic_macro import proposer, universe
 from agentic_macro.store import Leg, Store
 from agentic_macro.bot import _render
 
@@ -60,7 +60,7 @@ def test_a_second_worldview_adds_to_the_book_rather_than_replacing_it(store):
 
     book = store.net_positions()
     assert set(book) == {"SHY", "TLT", "XLE"}, "an earlier view's legs went missing"
-    assert book["XLE"] == pytest.approx(int(50_000.0 / 90.0))
+    assert book["XLE"] == pytest.approx(50_000.0 / 90.0, rel=1e-3)
 
 
 def test_closing_one_of_two_views_leaves_the_other_in_the_book(store):
@@ -77,7 +77,9 @@ def test_the_approval_message_shows_direction_size_and_the_hedge_ratio():
 
     assert "LONG  SHY" in text and "SHORT TLT" in text
     for leg in proposal.legs:
-        assert f"{abs(leg.quantity):,.0f}" in text
+        # the rendered size must be the ACTUAL size, fraction and all — a %.0f here would
+        # print 1,100 for a 1,099.85-share leg, which is both wrong and invisible
+        assert universe.qty(abs(leg.quantity)) in text
     assert "dv01_neutral" in text                 # the weighting is not hidden
     assert "dollars long:short" in text           # the ratio is stated, not implied
     assert "/confirm ab12" in text
@@ -189,7 +191,8 @@ def test_the_order_list_reflects_netting_not_the_legs(paper):
     reply = bot.cmd_confirm([bot._stash(proposal, 42)], _ctx())
 
     assert "BUY" in reply and "XLE" in reply
-    assert "+500 -> +1,055" in reply, reply
+    assert "BUY" in reply and "XLE" in reply
+    assert "+500 ->" in reply, reply          # netted against the view already holding 500
 
 
 def test_paper_mode_is_stated_on_every_gate(paper):

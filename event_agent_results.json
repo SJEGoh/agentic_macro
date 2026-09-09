@@ -1,0 +1,2505 @@
+{
+ "2026-08-12T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "stagflation",
+  "weighting": "inverse_vol",
+  "confidence": "medium",
+  "reasoning": "Current market sentiment has pivoted aggressively dovish, with rate hike odds plunging following labor market weakness. However, rising oil prices create a risk of a headline CPI surprise that the market is not currently positioned for. The stagflation playbook captures the risk of sticky inflation (long energy and commodities) paired with a growth slowdown (short discretionary and duration), which is the most challenging outcome for the current 'soft landing' consensus.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2026-08-12",
+    "title": "The Odds of a September Rate Hike Have Plunged, but the Federal Reserve's Job Just Became Infinitely More Challenging"
+   },
+   {
+    "published": "2026-08-11",
+    "title": "Stock Market Today, Aug. 11: Markets Slip as Oil Prices Rise, Upwork Tumbles on Mixed Earnings"
+   },
+   {
+    "published": "2026-08-12",
+    "title": "The Stock Market Is Flashing the Same Warning Signal That It Did Before the Dot-Com Bubble. Here's What History Says Comes Next."
+   },
+   {
+    "published": "2026-08-11",
+    "title": "This Buffett Oil Stock Is Quietly Outperforming Chevron Under Greg Abel. Is It Worth Buying Now?"
+   },
+   {
+    "published": "2026-08-11",
+    "title": "The U.S. Labor Market Is Weakening. These 2 Dividend Stocks Look Built to Weather a Recession"
+   },
+   {
+    "published": "2026-08-09",
+    "title": "The Federal Reserve Just Released Its August Inflation Forecast, and It Could Put the FOMC on a Collision Course for Its September Meeting"
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "TLT",
+    "quantity": -481.3876,
+    "price": 82.19,
+    "notional": -39565.246844
+   },
+   {
+    "symbol": "XLY",
+    "quantity": -140.5288,
+    "price": 119.24,
+    "notional": -16756.654111999997
+   },
+   {
+    "symbol": "DBC",
+    "quantity": 371.4897,
+    "price": 29.97,
+    "notional": 11133.546309000001
+   },
+   {
+    "symbol": "XLE",
+    "quantity": 167.3887,
+    "price": 60.93,
+    "notional": 10198.993491
+   },
+   {
+    "symbol": "GLD",
+    "quantity": 24.5549,
+    "price": 400.96,
+    "notional": 9845.532704
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-08-12T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2026-08-12T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "I am positioning for a hotter-than-expected July CPI print relative to a market currently priced for a perfect disinflationary glide path. While headline inflation has moderated, I expect sticky shelter and services components to surprise to the upside. The breakeven widener is the most direct expression of this view, isolating the inflation expectation repricing from the move in real rates that would follow a hawkish Fed interpretation.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 433.0267,
+    "price": 106.89,
+    "notional": 46286.223963000004
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -443.7791,
+    "price": 92.87,
+    "notional": -41213.765017000005
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-08-12T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2026-09-03T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "cyclical_rotation",
+  "weighting": "beta_neutral",
+  "confidence": "medium",
+  "reasoning": "An upward revision to Q2 GDP would signal that the US economy is operating with more momentum than initially captured, favoring cyclical sectors (XLI, XLB, XLY) over defensive ones (XLP, XLU). This structure is beta-neutral to isolate the growth surprise from potential interest-rate-driven equity volatility, as a stronger print reinforces a 'higher-for-longer' policy path which can sometimes weigh on broad index beta. Failure would occur if the GDP print is revised lower, signaling a growth scare that would favor defensive hideouts.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "XLU",
+    "quantity": -682.6373,
+    "price": 42.67,
+    "notional": -29128.133591
+   },
+   {
+    "symbol": "XLP",
+    "quantity": -340.5604,
+    "price": 85.53,
+    "notional": -29128.131012
+   },
+   {
+    "symbol": "XLB",
+    "quantity": 192.1006,
+    "price": 52.95,
+    "notional": 10171.72677
+   },
+   {
+    "symbol": "XLI",
+    "quantity": 58.8709,
+    "price": 172.78,
+    "notional": 10171.714102
+   },
+   {
+    "symbol": "XLY",
+    "quantity": 77.4879,
+    "price": 114.86,
+    "notional": 8900.260194
+   }
+  ],
+  "kind": "other",
+  "when": "2026-09-03T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2026-09-04T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "soft_landing",
+  "weighting": "inverse_vol",
+  "confidence": "medium",
+  "reasoning": "The upcoming August NFP report is likely to show a labor market that is cooling but not breaking. In the current macro environment, a print that confirms normalization without a collapse in the unemployment rate allows for a normalization of the discount rate while maintaining growth expectations. This 'goldilocks' outcome is the primary catalyst for the soft-landing playbook: long the rate-sensitive laggards (small-caps, credit) and short the haven premium (gold, staples) that has been priced in for a harder landing or stagflation scenario.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "HYG",
+    "quantity": 582.5724,
+    "price": 79.21,
+    "notional": 46145.559804
+   },
+   {
+    "symbol": "XLP",
+    "quantity": -165.1106,
+    "price": 85.26,
+    "notional": -14077.329756000001
+   },
+   {
+    "symbol": "IWM",
+    "quantity": 36.8411,
+    "price": 295.19,
+    "notional": 10875.124308999999
+   },
+   {
+    "symbol": "GLD",
+    "quantity": -21.8915,
+    "price": 410.22,
+    "notional": -8980.33113
+   },
+   {
+    "symbol": "XLY",
+    "quantity": 63.7269,
+    "price": 116.46,
+    "notional": 7421.634774
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-09-04T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2025-09-05T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The Fed's slower rate-cutting cycle (context) implies markets price in a dovish stance, but the Nonfarm Payrolls report could confirm this. A weaker-than-expected report would accelerate cuts, steepening the curve. The steepener (long SHY, short TLT) profits from front-end rallies and long-end declines, aligning with rate-cut expectations. Context suggests the market is already pricing a slowdown, so this structure bets on confirmation.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2025-09-04",
+    "title": "Why Texas Roadhouse Stock Slipped Today"
+   },
+   {
+    "published": "2025-09-04",
+    "title": "Wall Street Gains On Rate Cut Bets, GE Hits Record Highs: What's Moving Markets Thursday?"
+   },
+   {
+    "published": "2025-09-04",
+    "title": "S&P 500: Short-Term Trend Hangs in Balance as Bulls Fight to Reclaim Momentum"
+   },
+   {
+    "published": "2025-09-05",
+    "title": "Why American Express Stock Gained 11% in August"
+   },
+   {
+    "published": "2025-09-04",
+    "title": "Federal Reserve To Follow 'Slower Rate Cutting Cycle' Despite Trump's Pressure As Beige Book Dampens Sentiment: Don't Expect 50 Bps Cut Hints Shapiro"
+   },
+   {
+    "published": "2025-09-04",
+    "title": "American Outdoor Brands Q1 Sales Drop"
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 952.8193,
+    "price": 82.8,
+    "notional": 78893.43804
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.6651,
+    "price": 87.23,
+    "notional": -8606.556673
+   }
+  ],
+  "kind": "NFP",
+  "when": "2025-09-05T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2025-09-05T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls data directly influences the Fed's policy path. A strong report (above expectations) would likely prompt rate hikes, steepening the curve (front end rallies more than long end). The steepener structure (long SHY, short TLT) profits from this slope change. A weak report would flatten the curve, but the structure is directional on the expected move (steepener) rather than the inverse.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 952.8193,
+    "price": 82.8,
+    "notional": 78893.43804
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.6651,
+    "price": 87.23,
+    "notional": -8606.556673
+   }
+  ],
+  "kind": "NFP",
+  "when": "2025-09-05T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2025-09-11T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The CPI report will directly influence breakeven inflation expectations. Long TIP (inflation-linked) vs short IEF (nominal belly) isolates this move, stripping out rate-level bets. Recent context hints at a potential upside surprise (tariffs, travel, used cars) that could push breakevens higher despite rate-cut expectations.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2025-09-11",
+    "title": "Goldman Sachs Says August CPI Inflation Is Heating Up: Tariffs, Travel, Used Cars Behind The Surge"
+   },
+   {
+    "published": "2025-09-11",
+    "title": "S&P 500: All Eyes Turn to CPI After Upbeat Day of Renewed AI Fervor"
+   },
+   {
+    "published": "2025-09-10",
+    "title": "One Surprise Inflation Number Could Change The Fed's Next Move"
+   },
+   {
+    "published": "2025-09-11",
+    "title": "AI-Driven Market Optimism Meets Rate-Cut Expectations: Can the Rally Last?"
+   },
+   {
+    "published": "2025-09-10",
+    "title": "Producer Inflation Tumbles\u2013And Wall Street Sets New Record Highs"
+   },
+   {
+    "published": "2025-09-11",
+    "title": "U.S. Bank Stocks Soared in August. Can the Rally Continue for These 2 Companies?"
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 414.6025,
+    "price": 111.64,
+    "notional": 46286.2231
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -424.4029,
+    "price": 97.11,
+    "notional": -41213.765619
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-09-11T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2025-09-11T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release directly impacts inflation expectations. The breakeven_widener isolates breakeven inflation by long TIP (inflation-linked) vs short IEF (nominal duration-matched). This captures the market's repricing of inflation without exposure to real rate levels. If CPI surprises higher, TIP outperforms; if lower, IEF outperforms. The structure is DV01-neutral, focusing purely on inflation expectations.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 414.6025,
+    "price": 111.64,
+    "notional": 46286.2231
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -424.4029,
+    "price": 97.11,
+    "notional": -41213.765619
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-09-11T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "ret_drift": null
+ },
+ "2025-09-17T18:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The FOMC rate decision directly impacts the slope of the yield curve. A steepener (long SHY, short TLT) captures the market's reaction to a rate cut (front-end rally) or a flattening (long-end sell-off). The structure is DV01-neutral, isolating the slope bet. The event is tradeable via the rates leg (SHY/TLT) and is priced in the curve's current level. Assuming the decision is a catalyst for a rate cut (common in slowing economies), the steepener expresses the slope trade without duration bias.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 950.5234,
+    "price": 83,
+    "notional": 78893.4422
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -95.2579,
+    "price": 90.35,
+    "notional": -8606.551265
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2025-09-17T14:00:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0004886550365186248,
+  "how_reaction": "intraday",
+  "ret_drift": 5.001970197645258e-05,
+  "how_drift": "intraday"
+ },
+ "2025-09-17T18:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The FOMC decision is a catalyst for rate changes, which directly impact the yield curve's slope. A steepener (long front end, short long end) profits if the curve steepens due to rate cuts (front end rallies) or term premium shifts. This structure isolates slope risk, neutral to rate level changes, and is the direct expression of a policy pivot or tightening cycle.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 950.5234,
+    "price": 83,
+    "notional": 78893.4422
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -95.2579,
+    "price": 90.35,
+    "notional": -8606.551265
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2025-09-17T14:00:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0004886550365186248,
+  "how_reaction": "intraday",
+  "ret_drift": 5.001970197645258e-05,
+  "how_drift": "intraday"
+ },
+ "2025-10-14T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts breakeven inflation expectations. Long TIP (inflation-linked) vs short IEF (nominal belly) isolates this variable, stripping out rate-level risk. If CPI surprises higher than priced, breakeven widens; if lower, it narrows. The structure is DV01-neutral, so it only reacts to the inflation surprise, not the level of rates.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 414.0462,
+    "price": 111.79,
+    "notional": 46286.224698000005
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -425.0594,
+    "price": 96.96,
+    "notional": -41213.759423999996
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-10-14T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0011943172224385926,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2025-10-14T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts inflation expectations, which the breakeven_widener isolates by long TIP (inflation-linked) vs short IEF (nominal duration). This structure strips out rate-level bets, focusing purely on breakeven inflation. The inverse_vol weighting balances risk across legs, as TIP and IEF have different volatility profiles.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 414.0462,
+    "price": 111.79,
+    "notional": 46286.224698000005
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -425.0594,
+    "price": 96.96,
+    "notional": -41213.759423999996
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-10-14T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": -0.0011943172224385926,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2025-10-29T18:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "flattener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC rate decision directly impacts the yield curve's slope. A flattener (long TLT, short SHY) captures the market's repricing of rate cuts or term premium shifts. This structure is DV01-neutral, isolating the slope trade from level risk, which is critical for events where the decision's impact hinges on curve dynamics rather than absolute rate levels. The trade assumes the decision will move the curve from its current level, either through easing or tightening, with the flattener profiting from the slope change.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": -949.3795,
+    "price": 83.1,
+    "notional": -78893.43645
+   },
+   {
+    "symbol": "TLT",
+    "quantity": 93.5292,
+    "price": 92.02,
+    "notional": 8606.556984
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2025-10-29T14:00:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0001067835120691853,
+  "how_reaction": "intraday",
+  "ret_drift": null,
+  "how_drift": "no drift window for SHY"
+ },
+ "2025-10-29T18:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "short_duration",
+  "weighting": "directional",
+  "confidence": "medium",
+  "reasoning": "The FOMC rate decision is a direct bet on the level of rates. If the decision is expected to raise rates (tightening), short_duration (short TLT/IEF) captures the bet that yields will rise. This assumes the market is pricing in a dovish outcome, and the decision will surprise to the hawkish side. The structure is directional and avoids beta exposure by focusing on duration instruments.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TLT",
+    "quantity": -475.4401,
+    "price": 92.02,
+    "notional": -43749.99800199999
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -448.35,
+    "price": 97.58,
+    "notional": -43749.993
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2025-10-29T14:00:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0010498127571508282,
+  "how_reaction": "intraday",
+  "ret_drift": null,
+  "how_drift": "no drift window for IEF"
+ },
+ "2025-11-13T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The CPI release will signal inflation expectations. A breakeven_widener (long TIP, short IEF) isolates inflation expectations without duration exposure. If CPI surprises higher, TIP outperforms IEF as breakevens widen; if lower, the structure underperforms but avoids duration risk. The trade is priced into the curve already, so conviction weights are low unless data diverges sharply from consensus.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 416.5052,
+    "price": 111.13,
+    "notional": 46286.222876
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -425.4104,
+    "price": 96.88,
+    "notional": -41213.759551999996
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-11-13T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0006194332443963407,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2025-11-13T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The CPI report directly impacts breakeven inflation expectations. Long TIP (inflation-linked) vs short IEF (nominal belly) isolates the inflation component, stripping out rate-level sensitivity. This structure profits if the CPI prints above consensus, widening breakeven inflation without requiring a view on real rates or curve level.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 416.5052,
+    "price": 111.13,
+    "notional": 46286.222876
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -425.4104,
+    "price": 96.88,
+    "notional": -41213.759551999996
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-11-13T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0006194332443963407,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2025-12-10T19:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision is a key event influencing the yield curve's slope. A 'steepener' (long front-end SHY, short long-end TLT) captures the market's reaction to a rate cut or easing cycle, which typically steepens the curve. This structure is DV01-neutral, isolating the slope trade from level risk. If the Fed cuts rates, SHY rallies more than TLT, profiting the trade. If the market prices in a hold but the Fed cuts, the steepener benefits from the unexpected easing. The structure avoids directional bias on rate levels, focusing on the curve's slope.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 953.8561,
+    "price": 82.71,
+    "notional": 78893.438031
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -97.8351,
+    "price": 87.97,
+    "notional": -8606.553747
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2025-12-10T14:00:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0006061815738873909,
+  "how_reaction": "intraday",
+  "ret_drift": null,
+  "how_drift": "no drift window for SHY"
+ },
+ "2025-12-10T19:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision will influence the yield curve's slope. A steepener (long SHY, short TLT) captures the market's reaction to rate changes: front-end rallies on cuts, long-end sells off on term premium or inflation. This is the canonical DV01-neutral expression of curve steepening, which is the most direct macro trade for a central bank event.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 953.8561,
+    "price": 82.71,
+    "notional": 78893.438031
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -97.8351,
+    "price": 87.97,
+    "notional": -8606.553747
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2025-12-10T14:00:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0006061815738873909,
+  "how_reaction": "intraday",
+  "ret_drift": null,
+  "how_drift": "no drift window for SHY"
+ },
+ "2025-12-16T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "flattener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The NFP report's impact on the yield curve is the causal chain. A weak report (lower than priced) would signal rate cuts, flattening the curve. A strong report (higher than priced) would signal rate hikes, also flattening the curve. The flattener structure (long TLT, short SHY) captures both scenarios: it profits if the long end rallies (growth fear) or the front end sells off (hikes). The event is tradeable via the rates leg, not the equity or FX legs.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": -951.4404,
+    "price": 82.92,
+    "notional": -78893.437968
+   },
+   {
+    "symbol": "TLT",
+    "quantity": 98.4731,
+    "price": 87.4,
+    "notional": 8606.54894
+   }
+  ],
+  "kind": "NFP",
+  "when": "2025-12-16T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0005527951534671976,
+  "how_reaction": "intraday",
+  "ret_drift": 0.00036754755621216766,
+  "how_drift": "intraday"
+ },
+ "2025-12-16T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The Nonfarm Payrolls report influences the Fed's rate path. A strong report (above expectations) would likely prompt rate hikes, steepening the curve. A steepener (long SHY, short TLT) captures this by profiting if the front end rallies more than the long end. The trade is DV01-neutral, isolating the curve's slope. If the report is weak, a flattener (reverse legs) would be appropriate, but the current structure assumes the market is pricing in a moderate outcome with potential for a hawkish surprise.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.4404,
+    "price": 82.92,
+    "notional": 78893.437968
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.4731,
+    "price": 87.4,
+    "notional": -8606.54894
+   }
+  ],
+  "kind": "NFP",
+  "when": "2025-12-16T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0005527951534671976,
+  "how_reaction": "intraday",
+  "ret_drift": -0.00036754755621216766,
+  "how_drift": "intraday"
+ },
+ "2025-12-18T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts breakeven inflation expectations. Long TIP (inflation-linked) vs short IEF (nominal duration-matched) isolates the inflation component, stripping out real rate levels. This structure profits if the CPI prints above consensus, pushing breakeven inflation higher.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 419.6775,
+    "price": 110.29,
+    "notional": 46286.231475
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -426.9971,
+    "price": 96.52,
+    "notional": -41213.760092
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-12-18T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0009082313732470043,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2025-12-18T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release directly impacts inflation expectations, which is the core variable of the breakeven_widener (long TIP vs short IEF). This structure isolates breakeven inflation, stripping out rate-level risk. If the CPI prints higher than priced, breakevens widen; if lower, they contract. The trade is DV01-neutral, so it captures pure inflation surprise without duration exposure.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 419.6775,
+    "price": 110.29,
+    "notional": 46286.231475
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -426.9971,
+    "price": 96.52,
+    "notional": -41213.760092
+   }
+  ],
+  "kind": "CPI",
+  "when": "2025-12-18T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": -0.0009082313732470043,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-01-08T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The GDP release could influence the yield curve's slope. A positive surprise (stronger-than-expected GDP) may prompt rate hikes (flattening the curve), while a negative surprise (weaker GDP) may lead to rate cuts (steepening). The steepener structure (long SHY, short TLT) captures slope changes, which are directly tied to economic data surprises. This is a DV01-neutral bet on curve movement, not level, aligning with the event's potential to shift market expectations about policy.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.7848,
+    "price": 82.89,
+    "notional": 78893.442072
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.0357,
+    "price": 87.79,
+    "notional": -8606.554103
+   }
+  ],
+  "kind": "other",
+  "when": "2026-01-08T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": 0.00020135330571638334,
+  "how_reaction": "gap",
+  "ret_drift": 9.577168859459954e-05,
+  "how_drift": "intraday"
+ },
+ "2026-01-08T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP release is a catalyst for rate expectations. A weaker-than-expected GDP would steepen the curve (long front-end SHY, short long-end TLT), while a stronger GDP might flatten it. The steepener structure captures the curve's slope sensitivity, which is the most direct macro expression of GDP's impact on rates. The event is not directly tradable, but the curve's response is.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.7848,
+    "price": 82.89,
+    "notional": 78893.442072
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.0357,
+    "price": 87.79,
+    "notional": -8606.554103
+   }
+  ],
+  "kind": "other",
+  "when": "2026-01-08T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.00020135330571638334,
+  "how_reaction": "gap",
+  "ret_drift": 9.577168859459954e-05,
+  "how_drift": "intraday"
+ },
+ "2026-01-09T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The Nonfarm Payrolls report directly influences the Fed's policy path and the yield curve. A strong report (above consensus) would likely steepen the curve as the front end rallies on rate-cut expectations, while the long end sells off on inflation concerns. The steepener (long SHY, short TLT) captures this slope trade. If the data surprises to the upside, the front end (SHY) gains as the Fed delays hikes, while the long end (TLT) loses as inflation risks rise. The DV01-neutral hedge ensures the trade is sensitive only to curve steepening, not level shifts.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 952.1294,
+    "price": 82.86,
+    "notional": 78893.44208400001
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.5295,
+    "price": 87.35,
+    "notional": -8606.551824999999
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-01-09T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": 0.00018395850045571535,
+  "how_reaction": "intraday",
+  "ret_drift": -0.000772099444541986,
+  "how_drift": "intraday"
+ },
+ "2026-01-09T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The NFP data is a key driver of rate expectations. A strong report (above-consensus) would likely signal tighter policy, steepening the curve (long SHY, short TLT). A weak report would flatten the curve (flattener), but the steepener is the most direct bet on the event's potential to shift the curve from current pricing. The structure is DV01-neutral, isolating slope risk, which is the primary macro lever here.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 952.1294,
+    "price": 82.86,
+    "notional": 78893.44208400001
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.5295,
+    "price": 87.35,
+    "notional": -8606.551824999999
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-01-09T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.00018395850045571535,
+  "how_reaction": "intraday",
+  "ret_drift": -0.000772099444541986,
+  "how_drift": "intraday"
+ },
+ "2026-01-13T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release will signal inflation expectations. A breakeven_widener (long TIP, short IEF) isolates breakeven inflation, stripping out real rate levels. If the CPI surprises higher, breakeven inflation widens, benefiting this structure. The trade is DV01-neutral, focusing purely on inflation expectations versus current pricing.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 420.0964,
+    "price": 110.18,
+    "notional": 46286.22135200001
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -428.5066,
+    "price": 96.18,
+    "notional": -41213.764788
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-01-13T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0003893854820214216,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-01-13T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The CPI release directly impacts breakeven inflation expectations. A higher-than-expected reading would widen breakeven inflation (TIP outperforms IEF) without necessarily moving real rates. The structure isolates this dynamic by pairing TIP (inflation-linked) against IEF (nominal, same curve segment).",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 420.0964,
+    "price": 110.18,
+    "notional": 46286.22135200001
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -428.5066,
+    "price": 96.18,
+    "notional": -41213.764788
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-01-13T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": -0.0003893854820214216,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-01-28T19:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision could influence the yield curve's slope. If the Fed signals a pause in hikes or cuts, the front end (SHY) may rally more than the long end (TLT), creating a steepener. This structure isolates the curve's slope, not its level, aligning with the event's potential impact on rate differentials.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.7848,
+    "price": 82.89,
+    "notional": 78893.442072
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.0245,
+    "price": 87.8,
+    "notional": -8606.5511
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-01-28T14:00:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -0.00017633732745549644,
+  "how_reaction": "intraday",
+  "ret_drift": 0.00025701638404346646,
+  "how_drift": "intraday"
+ },
+ "2026-01-28T19:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision will influence the yield curve's slope. A 'steepener' (long SHY, short TLT) captures the market's expectation of a rate cut, where the front end rallies more than the long end. This is DV01-neutral, isolating the slope trade. The structure is appropriate for a surprise cut, which would steepen the curve. The inverse_vol weighting balances risk across legs, avoiding overexposure to any single instrument.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.7848,
+    "price": 82.89,
+    "notional": 78893.442072
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.0245,
+    "price": 87.8,
+    "notional": -8606.5511
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-01-28T14:00:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": -0.00017633732745549644,
+  "how_reaction": "intraday",
+  "ret_drift": 0.00025701638404346646,
+  "how_drift": "intraday"
+ },
+ "2026-01-29T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP revision could signal a change in economic growth expectations, affecting the yield curve. A steepener (long SHY, short TLT) captures the slope of the curve, which is sensitive to growth and policy expectations. If the revision suggests stronger growth, the front end may rally on rate cuts, while the long end carries term premium. If weaker, the curve may steepen due to central bank action. The structure is DV01-neutral, isolating slope risk.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.7848,
+    "price": 82.89,
+    "notional": 78893.442072
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.2483,
+    "price": 87.6,
+    "notional": -8606.55108
+   }
+  ],
+  "kind": "other",
+  "when": "2026-01-29T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": 2.603156948578674e-05,
+  "how_reaction": "intraday",
+  "ret_drift": 4.8339747371768835e-05,
+  "how_drift": "intraday"
+ },
+ "2026-01-29T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "cyclical_rotation",
+  "weighting": "beta_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP revision will signal economic momentum. A positive revision boosts cyclicals (XLI/XLB/XLY) vs defensives (XLP/XLU), as growth sectors benefit from stronger demand. A negative revision would reverse this, but the structure is set for the most direct expression of a growth impulse.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "XLP",
+    "quantity": -353.8403,
+    "price": 82.32,
+    "notional": -29128.133496
+   },
+   {
+    "symbol": "XLU",
+    "quantity": -672.2394,
+    "price": 43.33,
+    "notional": -29128.133202
+   },
+   {
+    "symbol": "XLB",
+    "quantity": 203.6382,
+    "price": 49.95,
+    "notional": 10171.72809
+   },
+   {
+    "symbol": "XLI",
+    "quantity": 61.9698,
+    "price": 164.14,
+    "notional": 10171.722972
+   },
+   {
+    "symbol": "XLY",
+    "quantity": 73.0907,
+    "price": 121.77,
+    "notional": 8900.254539
+   }
+  ],
+  "kind": "other",
+  "when": "2026-01-29T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0002827867040450186,
+  "how_reaction": "intraday",
+  "ret_drift": -0.001094180226649492,
+  "how_drift": "intraday"
+ },
+ "2026-02-11T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The NFP report influences the Fed's rate path. A strong print (above consensus) raises near-term rate hike expectations, steepening the curve. The steepener structure (long SHY, short TLT) captures this slope move without exposure to rate level. Weak data would flatten the curve, but the structure is directional on the slope, not the level.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.3257,
+    "price": 82.93,
+    "notional": 78893.44030100001
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -97.2162,
+    "price": 88.53,
+    "notional": -8606.550186
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-02-11T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -0.00022192035154858502,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0001286440473851085,
+  "how_drift": "intraday"
+ },
+ "2026-02-11T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls data directly influences the Fed's rate policy. A strong report (above-consensus employment growth) would signal tighter policy, steepening the curve (front-end rallies, long-end falls). The steepener (long SHY, short TLT) captures this slope move. A weak report would flatten the curve, but the structure is DV01-neutral and bets on the slope direction regardless of level. The event is tradeable via the rates curve.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 951.3257,
+    "price": 82.93,
+    "notional": 78893.44030100001
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -97.2162,
+    "price": 88.53,
+    "notional": -8606.550186
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-02-11T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": -0.00022192035154858502,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0001286440473851085,
+  "how_drift": "intraday"
+ },
+ "2026-02-13T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release directly impacts breakeven inflation expectations. Long TIP (inflation-linked) vs short IEF (nominal, same curve part) isolates the inflation surprise, stripping out real rate movements. If the CPI prints above consensus, breakevens widen; if below, they compress. This structure avoids duration exposure while targeting the pure inflation signal.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 416.056,
+    "price": 111.25,
+    "notional": 46286.229999999996
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -425.6301,
+    "price": 96.83,
+    "notional": -41213.762583
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-02-13T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0008373589875508597,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-02-13T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release will influence inflation expectations, which directly impact breakeven inflation. Long TIP (inflation-linked) vs short IEF (nominal duration-matched) isolates this variable. If CPI surprises higher, breakevens widen; if lower, they compress. The structure is DV01-neutral, avoiding exposure to rate-level shifts.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 416.056,
+    "price": 111.25,
+    "notional": 46286.229999999996
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -425.6301,
+    "price": 96.83,
+    "notional": -41213.762583
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-02-13T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": -0.0008373589875508597,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-03-05T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP release could signal economic health, influencing rate expectations. A steepener (long SHY, short TLT) profits if the curve steepens due to growth fears or cuts, which often precede GDP data. The structure is DV01-neutral, isolating slope risk, and aligns with macro views on policy timing.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 953.395,
+    "price": 82.75,
+    "notional": 78893.43625
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -96.5401,
+    "price": 89.15,
+    "notional": -8606.549915
+   }
+  ],
+  "kind": "other",
+  "when": "2026-03-05T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": -9.293469065663619e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -5.252815597479825e-05,
+  "how_drift": "intraday"
+ },
+ "2026-03-05T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP release is a key driver of yield curve expectations. A surprise below consensus (soft landing) would steepen the curve as the Fed cuts rates, while a surprise above (strong growth) would flatten it. The steepener structure (long SHY, short TLT) captures the slope trade, which is the direct macro expression of GDP surprises. The event is priced in the curve already, but the structure is neutral to level shifts, focusing on the slope change the release could trigger.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 953.395,
+    "price": 82.75,
+    "notional": 78893.43625
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -96.5401,
+    "price": 89.15,
+    "notional": -8606.549915
+   }
+  ],
+  "kind": "other",
+  "when": "2026-03-05T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": -9.293469065663619e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -5.252815597479825e-05,
+  "how_drift": "intraday"
+ },
+ "2026-03-06T13:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls (NFP) data directly influences the Fed's rate policy and the yield curve's slope. A strong NFP reinforces expectations of rate hikes, steepening the curve (long front-end SHY, short long-end TLT). A weak NFP could flatten the curve, but the steepener structure is the direct expression of slope sensitivity. The trade is DV01-neutral, isolating the curve's slope from level risk.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 954.0868,
+    "price": 82.69,
+    "notional": 78893.437492
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -96.9316,
+    "price": 88.79,
+    "notional": -8606.556764
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-03-06T08:30:00-05:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0003584601229342126,
+  "how_reaction": "intraday",
+  "ret_drift": 0.00032397337882373033,
+  "how_drift": "intraday"
+ },
+ "2026-03-06T13:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls (NFP) data drives expectations about labor market strength, which directly impacts interest rate policy. A strong NFP reinforces expectations of higher rates, steepening the yield curve (front-end rises more than long-end). The steepener structure (long SHY, short TLT) isolates this slope move. Financials (XLF) may also benefit from rate hikes, but the core trade is the curve steepening. Equal notional weights ensure the structure is DV01-neutral to curve level shifts, focusing purely on slope.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 954.0868,
+    "price": 82.69,
+    "notional": 78893.437492
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -96.9316,
+    "price": 88.79,
+    "notional": -8606.556764
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-03-06T08:30:00-05:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0003584601229342126,
+  "how_reaction": "intraday",
+  "ret_drift": 0.00032397337882373033,
+  "how_drift": "intraday"
+ },
+ "2026-03-11T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts inflation expectations, which the breakeven_widener isolates by long TIP (inflation-linked) vs short IEF (nominal duration). This structure strips out real rate levels, focusing purely on breakeven inflation. If the CPI prints above consensus, TIP outperforms IEF; if below, the reverse. The structure is DV01-neutral, avoiding unintended rate-level exposure.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 416.0934,
+    "price": 111.24,
+    "notional": 46286.22981599999
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -427.3513,
+    "price": 96.44,
+    "notional": -41213.759372
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-03-11T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0007840157083059756,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-03-11T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts inflation expectations, which drive breakeven inflation. Long TIP (inflation-linked) vs short IEF (nominal) isolates this without exposing to rate-level bets. If the report surprises higher, breakevens widen; if lower, they compress. The structure is DV01-neutral, focusing purely on inflation expectations.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 416.0934,
+    "price": 111.24,
+    "notional": 46286.22981599999
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -427.3513,
+    "price": 96.44,
+    "notional": -41213.759372
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-03-11T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0007840157083059756,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-03-18T18:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision will influence the yield curve's slope. A BULL steepener (long front end, short long end) bets on cuts in the front end (SHY) outpacing long-end (TLT) rallies, typical if the Fed surprises with easing. This structure isolates the curve's slope, not its level, aligning with the event's direct impact on rate differentials.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 954.4331,
+    "price": 82.66,
+    "notional": 78893.44004599999
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.4168,
+    "price": 87.45,
+    "notional": -8606.54916
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-03-18T14:00:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 2.2510716091619727e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0005807508578178547,
+  "how_drift": "intraday"
+ },
+ "2026-03-18T18:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC rate decision directly impacts the yield curve's slope. A 'steepener' (long front-end, short back-end) captures the market's reaction to a rate cut or easing cycle, which typically steepens the curve. The structure is DV01-neutral to the level of rates, isolating the slope trade. The event is priced in advance, so the trade hinges on the decision diverging from expectations (e.g., cuts vs. holds).",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 954.4331,
+    "price": 82.66,
+    "notional": 78893.44004599999
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -98.4168,
+    "price": 87.45,
+    "notional": -8606.54916
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-03-18T14:00:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 2.2510716091619727e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0005807508578178547,
+  "how_drift": "intraday"
+ },
+ "2026-03-24T12:30:00+00:00|ctx": {
+  "expressible": false,
+  "reasoning": "The GDP revision is a single data point with no direct tradable expression in the universe. While it could indirectly influence equities (SPY/QQQ) or rates (TLT/IEF), the structure requires a directional bet on economic growth without a clear mapping to the instruments. The event is too specific and lacks a hedged, multi-asset expression in the playbook.",
+  "n_context": 0,
+  "kind": "other",
+  "when": "2026-03-24T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": null,
+  "how_reaction": "no position",
+  "ret_drift": null,
+  "how_drift": "no position"
+ },
+ "2026-03-24T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "soft_landing",
+  "weighting": "inverse_vol",
+  "confidence": "high",
+  "reasoning": "The GDP revision could signal a soft landing (growth without inflation), which aligns with long rate-sensitive laggards (IWM, HYG) and short the haven premium (GLD, XLP). This structure profits if disinflation continues without growth breaking, which is the scenario a GDP revision might confirm.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "HYG",
+    "quantity": 678.4335,
+    "price": 79.44,
+    "notional": 53894.75724
+   },
+   {
+    "symbol": "XLP",
+    "quantity": -192.5924,
+    "price": 81.18,
+    "notional": -15634.651032000002
+   },
+   {
+    "symbol": "IWM",
+    "quantity": 49.5595,
+    "price": 247.45,
+    "notional": 12263.498275
+   },
+   {
+    "symbol": "GLD",
+    "quantity": -14.125,
+    "price": 404.04,
+    "notional": -5707.0650000000005
+   }
+  ],
+  "kind": "other",
+  "when": "2026-03-24T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": -7.704001027177557e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -0.00018907481875974117,
+  "how_drift": "intraday"
+ },
+ "2026-04-03T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The NFP report drives rate expectations. A strong print (above 200k jobs) would steepen the curve as front-end rates rise faster than long-end rates during tightening cycles. The steepener (long SHY, short TLT) captures this slope trade. If the data surprises to the upside, the structure profits as the curve steepens; if it misses, the structure loses but remains the most direct rate-sensitivity expression. No thin instruments involved.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 957.9096,
+    "price": 82.36,
+    "notional": 78893.434656
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -99.1653,
+    "price": 86.79,
+    "notional": -8606.556387
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-04-03T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": null,
+  "how_reaction": "no bars for SHY,TLT",
+  "ret_drift": null,
+  "how_drift": "no bars for SHY,TLT"
+ },
+ "2026-04-03T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls (NFP) data directly influences expectations for Fed policy and the yield curve. A strong NFP reinforces hawkish bias, steepening the curve (long front-end SHY, short long-end TLT). A weak NFP could flatten the curve, but the structure is DV01-neutral to isolate slope, not level. The trade captures the market's pricing of policy path shifts, which NFP often triggers.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 957.9096,
+    "price": 82.36,
+    "notional": 78893.434656
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -99.1653,
+    "price": 86.79,
+    "notional": -8606.556387
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-04-03T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "how_reaction": "no bars for SHY,TLT",
+  "ret_drift": null,
+  "how_drift": "no bars for SHY,TLT"
+ },
+ "2026-04-10T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release directly impacts inflation expectations, which the breakeven_widener isolates by long TIP (inflation-linked) vs short IEF (nominal duration). This structure strips out real rate levels, focusing purely on breakeven inflation. If the CPI surprises higher, the trade captures the widening of inflation expectations; if lower, it shorts the expectation. The inverse_vol weighting balances risk across legs, as TIP and IEF have different volatility profiles.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 417.1434,
+    "price": 110.96,
+    "notional": 46286.231664
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -431.8743,
+    "price": 95.43,
+    "notional": -41213.764449
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-04-10T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.00036091856460459447,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-04-10T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release directly impacts inflation expectations, which the breakeven_widener isolates by long TIP (inflation-linked) vs short IEF (nominal duration-matched). This structure strips out real rate levels, focusing purely on breakeven inflation. If the CPI prints higher than priced, TIP outperforms; if lower, IEF does. The inverse_vol weighting balances risk across legs, as TIP's volatility is higher than IEF's.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 417.1434,
+    "price": 110.96,
+    "notional": 46286.231664
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -431.8743,
+    "price": 95.43,
+    "notional": -41213.764449
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-04-10T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.00036091856460459447,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-04-29T18:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision will influence the yield curve's slope. A steepener (long SHY, short TLT) captures the market's reaction to rate changes: front-end rallies on cuts, long-end sells on hikes. This is the canonical trade for slope sensitivity around central bank decisions.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 956.2841,
+    "price": 82.5,
+    "notional": 78893.43824999999
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -99.6475,
+    "price": 86.37,
+    "notional": -8606.554575
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-04-29T14:00:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": -4.6959162166444026e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0002814500818428141,
+  "how_drift": "intraday"
+ },
+ "2026-04-29T18:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "flattener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision directly impacts the yield curve's slope. A flattener (long TLT, short SHY) isolates the curve's slope change: long the long end (TLT) to profit if the Fed cuts rates (flattening the curve) and short the front end (SHY) to capture the relative outperformance of the long end during easing cycles. This structure is DV01-neutral to the level of rates, focusing purely on the slope.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": -956.2841,
+    "price": 82.5,
+    "notional": -78893.43824999999
+   },
+   {
+    "symbol": "TLT",
+    "quantity": 99.6475,
+    "price": 86.37,
+    "notional": 8606.554575
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-04-29T14:00:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 4.6959162166444026e-05,
+  "how_reaction": "intraday",
+  "ret_drift": 0.0002814500818428141,
+  "how_drift": "intraday"
+ },
+ "2026-05-07T12:30:00+00:00|ctx": {
+  "expressible": false,
+  "reasoning": "The GDP release is a single event with no direct expression in the tradeable universe. Structures here are ongoing trends (curve shape, credit cycles, etc.), not event-driven. A GDP surprise would require a directional bet on rates or equities, but the playbook lacks a direct mapping to this variable. The closest would be 'soft_landing' or 'hard_landing' structures, but they are broader economic views, not GDP-specific.",
+  "n_context": 0,
+  "kind": "other",
+  "when": "2026-05-07T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": null,
+  "how_reaction": "no position",
+  "ret_drift": null,
+  "how_drift": "no position"
+ },
+ "2026-05-07T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP release will influence rate expectations. A strong print (above consensus) would steepen the curve as front-end yields rally on rate hike anticipation. The steepener (long SHY, short TLT) captures this slope move without exposure to rate level. The trade is indirect: GDP affects growth/inflation expectations, which in turn shape the curve. The structure is DV01-neutral, isolating slope risk.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 958.608,
+    "price": 82.3,
+    "notional": 78893.4384
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -99.9832,
+    "price": 86.08,
+    "notional": -8606.553855999999
+   }
+  ],
+  "kind": "other",
+  "when": "2026-05-07T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 7.075028315462331e-05,
+  "how_reaction": "intraday",
+  "ret_drift": -0.00029046911599378685,
+  "how_drift": "intraday"
+ },
+ "2026-05-08T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The NFP report is a key driver of rate expectations and curve shape. A steepener (long SHY, short TLT) captures the slope of the curve, which is directly influenced by labor market data. If the report surprises to the upside (stronger employment), the front end may rally on cut expectations, while the long end sells off on term premium. If it surprises to the downside, the long end may rally on growth fears. The structure is neutral to rate level, isolating the slope trade.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 959.424,
+    "price": 82.23,
+    "notional": 78893.43552
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -100.4851,
+    "price": 85.65,
+    "notional": -8606.548815
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-05-08T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.00019435258084502647,
+  "how_reaction": "intraday",
+  "ret_drift": -0.00020419217223134124,
+  "how_drift": "intraday"
+ },
+ "2026-05-08T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "Nonfarm Payrolls (NFP) data directly influences the yield curve's slope via Fed policy expectations. A surprise in NFP could steepen or flatten the curve depending on whether it reinforces or contradicts the current pricing of rate hikes/cuts. The steepener structure (long front-end duration, short long-end duration) isolates the slope trade, neutral to rate-level changes. This is the canonical expression of a curve trade driven by labor-market surprises.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 959.424,
+    "price": 82.23,
+    "notional": 78893.43552
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -100.4851,
+    "price": 85.65,
+    "notional": -8606.548815
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-05-08T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.00019435258084502647,
+  "how_reaction": "intraday",
+  "ret_drift": -0.00020419217223134124,
+  "how_drift": "intraday"
+ },
+ "2026-05-12T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release directly impacts inflation expectations, which this structure isolates by long TIP (inflation-linked) vs short IEF (nominal duration-matched). A higher-than-expected CPI would widen breakeven inflation, benefiting this trade. The structure avoids duration exposure by matching IEF's 7.3y duration with TIP's 6.5y duration, focusing purely on inflation expectations.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 415.8317,
+    "price": 111.31,
+    "notional": 46286.226527
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -435.4793,
+    "price": 94.64,
+    "notional": -41213.760952000004
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-05-12T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0001809042599777791,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0005659015808566676,
+  "how_drift": "intraday"
+ },
+ "2026-05-12T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts inflation expectations, which the breakeven_widener isolates by pairing TIP (inflation-linked) against IEF (nominal duration-matched). This structure profits if breakeven inflation widens (higher CPI than priced) or narrows (lower CPI than priced), without exposure to real rate levels. The event is tradeable via the TIP/IEF pair, which are both liquid and unflagged for decay.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 415.8317,
+    "price": 111.31,
+    "notional": 46286.226527
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -435.4793,
+    "price": 94.64,
+    "notional": -41213.760952000004
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-05-12T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0001809042599777791,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0005659015808566676,
+  "how_drift": "intraday"
+ },
+ "2026-06-04T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "soft_landing",
+  "weighting": "inverse_vol",
+  "confidence": "medium",
+  "reasoning": "The GDP revision may signal a soft landing (inflation falls without growth breaking). This structure bets on rate-sensitive laggards (IWM/XLY/HYG) outperforming defensives (XLP) and gold (GLD), funded by shorting the haven premium. A soft landing implies cuts into an intact economy, aligning with the legs.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "HYG",
+    "quantity": 446.5128,
+    "price": 79.68,
+    "notional": 35578.139904
+   },
+   {
+    "symbol": "XLP",
+    "quantity": -257.1794,
+    "price": 82.16,
+    "notional": -21129.859503999996
+   },
+   {
+    "symbol": "GLD",
+    "quantity": -27.9218,
+    "price": 407.87,
+    "notional": -11388.464566
+   },
+   {
+    "symbol": "IWM",
+    "quantity": 34.3053,
+    "price": 287.67,
+    "notional": 9868.605651000002
+   },
+   {
+    "symbol": "XLY",
+    "quantity": 81.683,
+    "price": 116.73,
+    "notional": 9534.856590000001
+   }
+  ],
+  "kind": "other",
+  "when": "2026-06-04T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": -0.003467283323811494,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for XLY"
+ },
+ "2026-06-04T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "flattener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP revision could signal economic strength or weakness, affecting rate expectations. A flattener (long TLT, short SHY) captures the market's sensitivity to growth vs. rate policy. If the revision implies stronger growth, the Fed may hike (bear flattener). If weaker, cuts may arrive (bull flattener). The structure is neutral to rate level but sensitive to curve slope, aligning with GDP's macroeconomic signal.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": -962.4672,
+    "price": 81.97,
+    "notional": -78893.436384
+   },
+   {
+    "symbol": "TLT",
+    "quantity": 100.8856,
+    "price": 85.31,
+    "notional": 8606.550536
+   }
+  ],
+  "kind": "other",
+  "when": "2026-06-04T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": -0.00024861394651808614,
+  "how_reaction": "intraday",
+  "ret_drift": 6.151357990121263e-05,
+  "how_drift": "intraday"
+ },
+ "2026-06-05T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls (NFP) data drives expectations about labor market strength, which directly impacts the yield curve. A strong NFP report implies the Fed may hike rates (shorting long-duration bonds like TLT) while the front end (SHY) rallies on near-term rate hikes. A weak report could steepen the curve via rate cuts. The steepener structure (long SHY, short TLT) isolates the slope of the curve, capturing the market's repricing of policy timing without betting on terminal rates. This is the most direct expression of NFP's influence on the curve.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 961.7632,
+    "price": 82.03,
+    "notional": 78893.435296
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -100.6614,
+    "price": 85.5,
+    "notional": -8606.5497
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-06-05T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0002608360658954623,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0007299203025540774,
+  "how_drift": "intraday"
+ },
+ "2026-06-05T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls (NFP) data drives expectations about labor market strength, which directly influences Fed policy and the yield curve. A strong NFP (above expectations) typically signals higher inflation and potential rate hikes, steepening the curve (front end rises more than long end). The steepener structure (long SHY, short TLT) isolates the slope of the curve, neutral to level changes. This is a DV01-neutral trade, capturing the market's repricing of policy timing or pace without assuming terminal rates. The inverse_vol weighting balances risk across legs, as SHY (front end) and TLT (long end) have different volatility profiles.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 961.7632,
+    "price": 82.03,
+    "notional": 78893.435296
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -100.6614,
+    "price": 85.5,
+    "notional": -8606.5497
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-06-05T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0002608360658954623,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0007299203025540774,
+  "how_drift": "intraday"
+ },
+ "2026-06-10T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI report directly impacts inflation expectations, which is the core variable of the breakeven_widener. Long TIP (inflation-linked) vs short IEF (nominal) isolates breakeven inflation. If CPI exceeds expectations, breakeven widens; if below, it narrows. The structure is DV01-neutral, focusing purely on inflation expectations rather than rate levels.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 423.4013,
+    "price": 109.32,
+    "notional": 46286.230116
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -439.4728,
+    "price": 93.78,
+    "notional": -41213.759184
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-06-10T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.00042998830400998463,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-06-10T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The CPI release directly impacts breakeven inflation expectations. Long TIP (inflation-linked) vs short IEF (nominal duration-matched) isolates the inflation component, stripping out real rate movements. If CPI exceeds expectations, breakeven inflation widens, benefiting this structure.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 423.4013,
+    "price": 109.32,
+    "notional": 46286.230116
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -439.4728,
+    "price": 93.78,
+    "notional": -41213.759184
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-06-10T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.00042998830400998463,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for TIP"
+ },
+ "2026-06-17T18:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision directly impacts the yield curve's slope. A steepener (long SHY, short TLT) profits if the front end rallies more than the long end (e.g., cuts are delivered) or if the long end sells off harder than the front (e.g., term premium rises). This structure isolates the curve's slope, which is the immediate market reaction to rate decisions. The event is priced in advance, but the trade captures the surprise in the curve's movement relative to expectations.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 960.6507,
+    "price": 82.125,
+    "notional": 78893.43873750001
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -99.8556,
+    "price": 86.19,
+    "notional": -8606.554164
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-06-17T14:00:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0014187623628324057,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0006890642419468755,
+  "how_drift": "intraday"
+ },
+ "2026-06-17T18:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision directly impacts the yield curve's slope. A steepener (long front-end SHY, short long-end TLT) captures the market's reaction to policy shifts without betting on rate level changes. This structure isolates the slope trade, which is the most direct expression of a rate decision's impact on the curve. The event's timing aligns with the need for a DV01-neutral structure to avoid carry drag from holding duration.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 960.6507,
+    "price": 82.125,
+    "notional": 78893.43873750001
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -99.8556,
+    "price": 86.19,
+    "notional": -8606.554164
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-06-17T14:00:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": -0.0014187623628324057,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0006890642419468755,
+  "how_drift": "intraday"
+ },
+ "2026-07-02T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The Nonfarm Payrolls data directly influences the Fed's rate policy and the yield curve's slope. A strong report (above-consensus employment growth) would pressure the front end (SHY) to rally on rate-cut expectations, while the long end (TLT) would fall on growth concerns. A weak report would reverse this. The steepener structure (long SHY, short TLT) isolates the curve's slope, capturing the market's repricing of policy timing without exposure to rate-level bets. This is the canonical trade for labor-market surprises.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 963.9961,
+    "price": 81.84,
+    "notional": 78893.440824
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -100.6379,
+    "price": 85.52,
+    "notional": -8606.553208
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-07-02T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0006411742394264939,
+  "how_reaction": "intraday",
+  "ret_drift": 2.190796691896889e-05,
+  "how_drift": "intraday"
+ },
+ "2026-07-02T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls (NFP) data drives expectations about labor market strength and Fed policy. A strong NFP (above consensus) would likely signal tighter policy, steepening the curve (long front-end, short long-end). A weak NFP would imply rate cuts, flattening the curve. The steepener structure (long SHY, short TLT) captures the slope of the curve, which is the direct market response to NFP-driven rate expectations. This is a DV01-neutral trade focused on the curve's slope, not its level.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 963.9961,
+    "price": 81.84,
+    "notional": 78893.440824
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -100.6379,
+    "price": 85.52,
+    "notional": -8606.553208
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-07-02T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.0006411742394264939,
+  "how_reaction": "intraday",
+  "ret_drift": 2.190796691896889e-05,
+  "how_drift": "intraday"
+ },
+ "2026-07-14T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "reflation",
+  "weighting": "inverse_vol",
+  "confidence": "medium",
+  "reasoning": "The CPI report is a key inflation indicator. A reflation trade (long real assets like commodities and energy equities, short nominal bonds) captures the scenario where higher inflation drives up commodity prices and lowers bond prices. This structure aligns with the causal chain: CPI surprise \u2192 inflation expectations \u2192 reflation trade. DBC/XLE represent real assets, TLT represents nominal duration.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TLT",
+    "quantity": -747.186,
+    "price": 83.97,
+    "notional": -62741.20842
+   },
+   {
+    "symbol": "DBC",
+    "quantity": 468.4489,
+    "price": 28.33,
+    "notional": 13271.157336999999
+   },
+   {
+    "symbol": "XLE",
+    "quantity": 202.4608,
+    "price": 56.74,
+    "notional": 11487.625792
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-07-14T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0007320539621324263,
+  "how_reaction": "gap",
+  "ret_drift": null,
+  "how_drift": "no drift window for DBC"
+ },
+ "2026-07-14T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "breakeven_widener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The CPI release is a key inflation data point. A higher-than-expected reading would widen breakeven inflation (TIP outperforms IEF), isolating the inflation expectation component. The structure is DV01-neutral, focusing purely on inflation expectations versus nominal yields. Long TIP (inflation-linked) and short IEF (similar duration nominal) captures this view. The inverse_vol weighting balances risk across legs.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TIP",
+    "quantity": 428.9336,
+    "price": 107.91,
+    "notional": 46286.224776
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -441.7811,
+    "price": 93.29,
+    "notional": -41213.758819
+   }
+  ],
+  "kind": "CPI",
+  "when": "2026-07-14T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": -0.0036048148372219116,
+  "how_reaction": "intraday",
+  "ret_drift": 0.00031514730001089,
+  "how_drift": "intraday"
+ },
+ "2026-07-29T18:00:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision will influence the slope of the yield curve. A steepener (long front-end SHY, short long-end TLT) captures the market's sensitivity to the Fed's policy pivot. If the decision signals a rate cut, the front end rallies more than the long end, creating a steepener. If the decision is a pause, the structure remains neutral to level shifts but profits from slope changes. The DV01-neutral hedge ensures the trade reflects the curve's shape, not its level.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 962.8196,
+    "price": 81.94,
+    "notional": 78893.438024
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -102.1671,
+    "price": 84.24,
+    "notional": -8606.556504
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-07-29T14:00:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.000757342821981574,
+  "how_reaction": "intraday",
+  "ret_drift": 0.001637909414273616,
+  "how_drift": "intraday"
+ },
+ "2026-07-29T18:00:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "custom",
+  "weighting": "directional",
+  "confidence": "medium",
+  "reasoning": "The FOMC decision is a direct driver of rate expectations. If the market is pricing in a cut (or a pause) but the decision is a hike, short duration (TLT/IEF) would profit. If the decision is a cut (or larger cut than priced), long duration (TLT/IEF) would profit. The structure must be directional in rates, as the event is a discrete catalyst. The playbook's 'long_duration' and 'short_duration' are the closest fits, but the decision's timing and magnitude relative to pricing determine the direction. Assuming the decision is a cut (common in late cycles), 'long_duration' is the bet.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "TLT",
+    "quantity": 692.4659,
+    "price": 84.24,
+    "notional": 58333.327416
+   },
+   {
+    "symbol": "IEF",
+    "quantity": 311.7429,
+    "price": 93.56,
+    "notional": 29166.665724000002
+   }
+  ],
+  "kind": "FOMC",
+  "when": "2026-07-29T14:00:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": -0.002273078413496428,
+  "how_reaction": "intraday",
+  "ret_drift": -0.007662216391254138,
+  "how_drift": "intraday"
+ },
+ "2026-08-06T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The GDP release influences expectations about the economy and policy, which directly impacts the yield curve. A steepener (long SHY, short TLT) captures the slope of the curve, which is sensitive to growth and rate expectations. If the GDP surprises to the upside, the curve may flatten (bear steepener), but if it disappoints, the curve may steepen (bull steepener). The structure is neutral to rate level, focusing on slope changes driven by the data.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 963.2898,
+    "price": 81.9,
+    "notional": 78893.43462
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -103.6934,
+    "price": 83,
+    "notional": -8606.5522
+   }
+  ],
+  "kind": "other",
+  "when": "2026-08-06T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": -0.0002035446321773654,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0001435637989392771,
+  "how_drift": "intraday"
+ },
+ "2026-08-06T12:30:00+00:00|noctx": {
+  "expressible": false,
+  "reasoning": "The GDP release itself is not directly tradable in the given universe. While the data could influence the yield curve (e.g., through rate expectations), the event is too specific and forward-looking to map cleanly to the available instruments. The structures here are based on current market positions, not future data releases. A trade would require anticipating the market's reaction to the data, which is speculative and not directly expressible with the provided tools.",
+  "n_context": 0,
+  "kind": "other",
+  "when": "2026-08-06T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": null,
+  "how_reaction": "no position",
+  "ret_drift": null,
+  "how_drift": "no position"
+ },
+ "2026-08-07T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "The NFP report is a key driver of rate expectations. A strong print (above consensus) would signal tighter policy, steepening the curve. The steepener (long SHY, short TLT) captures this slope move. If the data surprises to the upside, SHY (front end) rallies on rate hike bets, while TLT (long end) falls as long yields stabilize or decline. This is a DV01-neutral trade focused on curve steepening, not level.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 964.4675,
+    "price": 81.8,
+    "notional": 78893.4415
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -104.2966,
+    "price": 82.52,
+    "notional": -8606.555432
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-08-07T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.00048630065644988924,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0002494686491364662,
+  "how_drift": "intraday"
+ },
+ "2026-08-07T12:30:00+00:00|noctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "medium",
+  "reasoning": "Nonfarm Payrolls data influences the Fed's rate policy, which directly impacts the yield curve. A strong report (higher employment) may signal tighter policy, steepening the curve (front-end rallies more than long-end). The steepener structure (long SHY, short TLT) captures this slope movement. The event is tradeable via rates instruments, and the structure is DV01-neutral to isolate slope, not level.",
+  "n_context": 0,
+  "context": [],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 964.4675,
+    "price": 81.8,
+    "notional": 78893.4415
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -104.2966,
+    "price": 82.52,
+    "notional": -8606.555432
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-08-07T08:30:00-04:00",
+  "arm": "noctx",
+  "ret_reaction": 0.00048630065644988924,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0002494686491364662,
+  "how_drift": "intraday"
+ },
+ "2026-09-03T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "steepener",
+  "weighting": "dv01_neutral",
+  "confidence": "high",
+  "reasoning": "The GDP revision could signal economic weakness, prompting rate cuts. A steepener (long front-end duration, short long-end duration) profits if the curve steepens due to cuts. This structure isolates slope risk, not level, aligning with a potential easing cycle if the GDP disappoints.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2026-09-03",
+    "title": "If a Stock Market Crash Is Coming, History Says This Is the Smartest Move Investors Can Make"
+   },
+   {
+    "published": "2026-09-03",
+    "title": "Apriem Advisors Releases Fourth Quarter Market Outlook: Optimism Tempered by Election-Cycle Caution"
+   },
+   {
+    "published": "2026-09-03",
+    "title": "Reasons to Retain Fresenius Medical Stock in Your Portfolio for Now"
+   },
+   {
+    "published": "2026-09-03",
+    "title": "Meet the Dividend King Stock That Yields Quadruple the S&P 500. Here's Why It's a Buy Now."
+   },
+   {
+    "published": "2026-09-03",
+    "title": "State Street Real Return ETF (RLY) Touches New 52-Week High"
+   },
+   {
+    "published": "2026-09-03",
+    "title": "JPMorgan ETFs (Ireland) ICAV: Dividend Declaration"
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "SHY",
+    "quantity": 966.3576,
+    "price": 81.64,
+    "notional": 78893.434464
+   },
+   {
+    "symbol": "TLT",
+    "quantity": -105.022,
+    "price": 81.95,
+    "notional": -8606.5529
+   }
+  ],
+  "kind": "other",
+  "when": "2026-09-03T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.0003720403274470631,
+  "how_reaction": "intraday",
+  "ret_drift": -0.00019673407002624327,
+  "how_drift": "intraday"
+ },
+ "2026-09-04T12:30:00+00:00|ctx": {
+  "expressible": true,
+  "structure": "short_duration",
+  "weighting": "directional",
+  "confidence": "high",
+  "reasoning": "The NFP release is a key driver of Fed policy expectations. Recent context (ADP jobs up 38K, falling Treasury yields) suggests markets may be pricing in a rate cut. However, a strong NFP (above 200K) would reinforce the Fed's hawkish stance, pushing rates higher. Short duration (TLT/IEF) profits from rising yields, which would occur if the NFP surprises to the upside and confirms tightening. This is a directional bet on 'yields rise' via the most convex instrument (TLT) and the belly (IEF) for a cuts-focused view.",
+  "n_context": 6,
+  "context": [
+   {
+    "published": "2026-09-04",
+    "title": "Stock Market News for Sep 4, 2026"
+   },
+   {
+    "published": "2026-09-04",
+    "title": "Breakfast News: Week in Review"
+   },
+   {
+    "published": "2026-09-03",
+    "title": "Fed Governor Chris Waller Just Significantly Upped the Stakes for the Sept. 11 Inflation Report. It Could Decide Whether There is a Rate Hike at the Fed's Upcoming Meeting"
+   },
+   {
+    "published": "2026-09-03",
+    "title": "Stock Market Midday, Sept. 3: Stocks Rally as Treasury Yields Fall, Broadcom Falls Despite Earnings Beat"
+   },
+   {
+    "published": "2026-09-02",
+    "title": "ADP Brings +38K Private-Sector Jobs in August"
+   },
+   {
+    "published": "2026-09-04",
+    "title": "Warren Buffett\u2019s Berkshire Hathaway Just Did This for the First Time in 15 Quarters. History Offers a Clue About What\u2019s Next, But the Evidence Piling Up Suggests History May Not Repeat Itself."
+   }
+  ],
+  "legs": [
+   {
+    "symbol": "TLT",
+    "quantity": -533.0815,
+    "price": 82.07,
+    "notional": -43749.998705
+   },
+   {
+    "symbol": "IEF",
+    "quantity": -474.1005,
+    "price": 92.28,
+    "notional": -43749.99414
+   }
+  ],
+  "kind": "NFP",
+  "when": "2026-09-04T08:30:00-04:00",
+  "arm": "ctx",
+  "ret_reaction": 0.002686725438715458,
+  "how_reaction": "intraday",
+  "ret_drift": -0.0022505388749512064,
+  "how_drift": "intraday"
+ }
+}

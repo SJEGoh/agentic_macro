@@ -5,11 +5,26 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      # The executor is reachable on the tailnet only; from another container that means the
-      # host's tailnet address, not localhost.
+      # Both of these must be reached from INSIDE the container, where localhost is the
+      # container itself. `.env` holds host-side values (Ollama's own OLLAMA_HOST convention
+      # is even a bind address, 0.0.0.0:11434, which nothing can connect to), so they are
+      # overridden here rather than relied upon.
       EXECUTOR_URL: ${EXECUTOR_URL:-http://host.docker.internal:8000}
+      OLLAMA_HOST: ${OLLAMA_HOST_FOR_CONTAINER:-http://host.docker.internal:11434}
       AGENTIC_DB_PATH: /app/db/worldviews.db
+      AGENTIC_MEMORY_PATH: /app/db/chroma
+      PYTHONUNBUFFERED: "1"
     volumes:
+      # Worldviews and the news store. Losing these would leave positions at the broker that
+      # no worldview claims, and the next netted book would close them without explanation.
       - ./db:/app/db
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      # The bot has no port to probe, so check the thing that would actually be wrong: a
+      # process that died, or one wedged before it reached the poll loop.
+      test: ["CMD-SHELL", "pgrep -f run_bot.py > /dev/null || exit 1"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 120s

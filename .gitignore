@@ -226,3 +226,11 @@ db/*.db
 db/*.db-wal
 db/*.db-shm
 venv_agentic/
+
+ROADMAP.md
+test.ipynb
+
+# cached news corpus for the notebook analysis (27MB)
+news_corpus.json
+
+db/chroma/

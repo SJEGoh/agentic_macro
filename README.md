@@ -61,14 +61,78 @@ instrument risk data in [`universe.py`](agentic_macro/universe.py). Weights in a
 risk-weighted structure are shares of **risk**, not dollars, which is what makes multi-leg
 structures come out right without special-casing any of them:
 
-| structure | weights given | dollars produced | property |
-|---|---|---|---|
-| steepener | SHY 1, TLT 1 | 9.17 : 1 | net DV01 ≈ 0 — pure slope |
-| butterfly | IEF 1, SHY 1, TLT 1 | 0.31 : 0.62 : 0.07 | wings equal *and* summing to the belly — pure curvature |
-| banks vs index | XLF 1, SPY 1 | 0.95 : 1 | net beta ≈ 0 — pure sector view |
+| structure | weighting | weights given | dollars produced | property |
+|---|---|---|---|---|
+| steepener | `dv01_neutral` | SHY 1, TLT 1 | 9.17 : 1 | net DV01 ≈ 0 — pure slope |
+| butterfly | `dv01_neutral` | IEF 1, SHY 1, TLT 1 | 0.31 : 0.62 : 0.07 | wings equal *and* summing to the belly |
+| banks vs index | `beta_neutral` | XLF 1, SPY 1 | 0.95 : 1 | net beta ≈ 0 — pure sector view |
+| commodity basket | `inverse_vol` | MCL 1, MGC 1 | 1 : 2 | equal *risk*, not equal dollars |
+
+**Inverse vol is the default** for multi-asset baskets. Equal dollars in a 51%-vol crude
+future and a 25%-vol gold future is twice the risk in one leg — a basket that looks
+diversified and is really a bet on crude. `inverse_vol` sizes each leg by `1/σ` from 60-day
+realised volatility, so equal weights mean equal risk. Curve trades stay on `dv01_neutral`
+and equity pairs on `beta_neutral`, because there the specific axis matters more than vol.
 
 The named structures live in [`playbooks.py`](agentic_macro/playbooks.py) — 28 of them, each
 with its legs, its weighting rule, when it works and how it fails.
+
+### Futures, and why one contract may not fit
+
+The universe holds 45 ETFs plus 12 futures — note futures (ZT/ZF/ZN/ZB), micro index
+(MES/MNQ/M2K), micro commodities (MCL/MGC/SIL) and FX (6E/6J). A futures leg carries its
+`multiplier`, and **every notional calculation in the codebase multiplies by it**: one ZN is
+$107,440, not $107.44. Getting that wrong understates a book by up to 1,000x and slips past
+an allocation cap computed from the same wrong number, which is why `test_futures_and_vol.py`
+pins it explicitly.
+
+Contracts are indivisible and large, so on a small sleeve many simply do not fit:
+
+| contract | notional | vs a $250k sleeve |
+|---|---|---|
+| ZT (2y note) | ~$205,000 | 82% — one contract |
+| ZN (10y note) | ~$107,000 | 43% |
+| MES (micro S&P) | ~$38,000 | usable |
+| MCL (micro crude) | ~$9,000 | usable |
+
+A DV01-matched ZT/ZB steepener needs roughly eight ZT per ZB — seven figures of notional. So
+below about $1m the ETF proxies remain the correct expression, and the sizing code refuses
+with the contract's price rather than quietly building a different trade. The model is shown
+each contract's cost in the prompt so it can choose an instrument that fits, and `/universe`
+shows you the same thing.
+
+### Falling back to the ETF
+
+When a futures leg cannot afford a single contract at the share the weighting gives it, the
+leg is **substituted for its ETF equivalent** (MGC→GLD, ZN→IEF, MCL→USO) and the structure is
+re-allocated. Re-allocation is not optional: the ETF has a different duration and volatility
+from the future, so swapping after sizing would leave the hedge ratio computed for an
+instrument no longer in the trade.
+
+This is categorically different from *dropping* a leg. Substitution keeps the underlying, the
+direction and the leg's place in the structure — only the fee and roll profile change.
+Dropping turns a pair into an outright, which is why that still refuses. Every swap is
+printed in the proposal, and the leg's rationale is tagged `[written for MCL]` so a
+justification written about the future cannot read as though it were about the ETF.
+
+The upshot: futures are free to propose. You get the contract when it fits and the ETF when
+it does not, and the trade survives either way.
+
+### Fractional shares
+
+ETF legs size **fractionally**, so a leg lands on its intended notional instead of being
+truncated down to a whole share — which on an expensive name threw away a slice of the
+position and unbalanced every hedge ratio it was part of. Verified to survive the whole path:
+the executor's netting compares deltas against an epsilon rather than rounding, and
+`build_order` assigns `order.totalQuantity` with no int cast.
+
+**Futures are never fractional**, flag or no flag — 0.4 contracts is not a position, and IB
+rejects such an order rather than rounding it. Quantities still truncate toward zero rather
+than rounding, so the guarantee that a book never costs more than the budget you approved
+survives; the precision given up is about two cents on a $400 share.
+
+Set `AGENTIC_FRACTIONAL=false` if the IB account is not enabled for fractional trading —
+that entitlement is per-account, and without it IB rejects rather than rounds.
 
 > **Why not a vector DB?** The whole library is a few thousand tokens: it fits in the prompt,
 > it caches, and the model sees *all* of it every call. Retrieval could only subtract — its
@@ -192,16 +256,22 @@ tunnel is up.
 | `/confirm <token>` | accept the view, and see the **orders** it implies. Sends nothing |
 | `/place <token>` | send those orders — the last gate |
 | `/views` `/view <id>` | what is on, and why |
+| `/resize <id> <size>` | scale a view: `80k`, `+50%`, `-30%`, `x1.5`. Every leg by the same factor, so the hedge ratio is unchanged |
+| `/adjust <id> <SYM> <n>` | set one leg (signed absolute); `+=`/`-=` to nudge; `0` removes it |
+| `/switch <id> <view>` | replace a worldview with a different one, in a single netted book |
+| `/cancel [token]` | throw away a pending proposal |
 | `/close <id>` | retire a worldview; its legs unwind on the next book |
 | `/book` | the netted book, and which views each name comes from |
 | `/sync` | re-send the netted book — self-heals drift, safe to repeat |
 | `/playbooks [name]` | the structures available |
+| `/universe [what]` | the instruments, and what one unit costs. `/universe ZN`, `/universe rates_fut` |
 
 ## Layout
 
 | path | what |
 |---|---|
-| [`universe.py`](agentic_macro/universe.py) | the closed instrument list + the duration/beta data hedge ratios come from |
+| [`universe.py`](agentic_macro/universe.py) | the closed instrument list + the duration/beta/multiplier data hedge ratios come from |
+| [`prices.py`](agentic_macro/prices.py) | Massive primary, yfinance fallback; prices and realised vol from one pull |
 | [`playbooks.py`](agentic_macro/playbooks.py) | the named structures, and the retrieval seam |
 | [`proposer.py`](agentic_macro/proposer.py) | the Gemini call, and the risk-space allocator |
 | [`store.py`](agentic_macro/store.py) | worldviews, their legs, and the netting |
@@ -258,9 +328,14 @@ into errors rather than being read as a proposal.
   exposure here is therefore via currency ETFs (UUP, UDN, FXE, FXY, FXB, FXF, FXA, FXC, CEW),
   which price and size like any other name. Real spot FX needs three dispatch sites in the
   executor changed, plus its netting and risk manager taught about `CASH`.
-- **Futures are not used**, so nothing here needs `multiplier` or `resolve_front`. If futures
-  legs are ever added, every one needs `instrument.multiplier` or its notional is understated
-  by the multiplier and sails past the allocation cap.
+- **Massive has no futures entitlement** on this account (`list_futures_products` answers
+  "You are not entitled to this data"), so futures price via yfinance only. Equities try
+  Massive first and fall back to yfinance. Micro contracts price off their full-size sibling
+  (MCL → `CL=F`) — same underlying at the same quoted price, and yfinance has 167 daily bars
+  for `CL=F` against exactly one for `MCL=F`.
+- **Futures expiry is not handled.** The universe names the product (`ZN`), and the executor
+  has `/resolve_front/{symbol}` to pick the front contract, but nothing here rolls a position
+  as expiry approaches. Treat futures legs as needing a manual roll for now.
 - **Nothing here schedules anything.** The sleeve only moves when you tell it to. `/sync` on
   a cron is worth adding if you want drift healed automatically.
 - **Duration and beta are approximations** and they drift with yields and regime. They are

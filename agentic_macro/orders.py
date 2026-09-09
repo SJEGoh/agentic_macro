@@ -20,7 +20,7 @@ from __future__ import annotations
 import logging
 from typing import NamedTuple
 
-from . import config
+from . import config, universe
 
 log = logging.getLogger("agentic-macro.orders")
 
@@ -99,13 +99,16 @@ def render(rows: list, prices: dict = None) -> str:
     traded = 0.0
     for row in rows:
         price = (prices or {}).get(row.symbol)
-        value = f"  = {'$%s' % f'{abs(row.delta) * price:,.0f}'}" if price else ""
-        if price:
-            traded += abs(row.delta) * price
+        unit = universe.resolve(row.symbol).notional(price) if price else None
+        value = f"  = {'$%s' % f'{abs(row.delta) * unit:,.0f}'}" if unit else ""
+        if unit:
+            traded += abs(row.delta) * unit
         note = "  CLOSE" if row.closes else ""
         owners = (f"  [#{', #'.join(str(h) for h in row.holders)}]" if row.holders else "")
-        lines.append(f"  {row.side:<4} {row.symbol:<5} {abs(row.delta):>9,.0f}"
-                     f"   ({row.current:+,.0f} -> {row.target:+,.0f}){note}{value}{owners}")
+        arrow = (f"({'+' if row.current >= 0 else ''}{universe.qty(row.current)} -> "
+                 f"{'+' if row.target >= 0 else ''}{universe.qty(row.target)})")
+        lines.append(f"  {row.side:<4} {row.symbol:<5} {universe.qty(abs(row.delta)):>12}"
+                     f"   {arrow}{note}{value}{owners}")
 
     lines.append(f"\n{len(rows)} order(s)" + (f" · {'$%s' % f'{traded:,.0f}'} traded"
                                               if traded else ""))
